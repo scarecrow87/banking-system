@@ -72,6 +72,11 @@ Install development dependencies,
 pip install -r requirements.txt
 ```
 
+Build Tailwind
+```bash
+npx tailwindcss -i ./static/src/css/main.css -o ./static/dist/css/main.css --watch
+```
+
 Migrate Database,
 ```bash
 python manage.py makemigrations  
@@ -101,6 +106,7 @@ celery -A banking_system worker -l info -P gevent
 
 celery -A banking_system beat -l info
 ```
+
 
 ## Images:
 ![alt text](https://i.imgur.com/FvgmEJL.png)
