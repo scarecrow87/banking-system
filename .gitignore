@@ -7,6 +7,7 @@ pip-selfcheck.json
 course_import.py
 .idea/
 static/dist/
+!static/dist/js/preline.js
 .vscode/
 db.json
 htmlcov/
