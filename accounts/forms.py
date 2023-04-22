@@ -28,10 +28,7 @@ class UserAddressForm(forms.ModelForm):
         for field in self.fields:
             self.fields[field].widget.attrs.update({
                 'class': (
-                    'appearance-none block w-full bg-gray-200 '
-                    'text-gray-700 border border-gray-200 rounded '
-                    'py-3 px-4 leading-tight focus:outline-none '
-                    'focus:bg-white focus:border-gray-500'
+                    'py-2 px-3 pr-11 block w-full border border-gray-200 shadow-sm text-sm rounded-lg focus:border-blue-500 focus:ring-blue-500 dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400'
                 )
             })
 
@@ -62,11 +59,7 @@ class UserRegistrationForm(UserCreationForm):
         for field in self.fields:
             self.fields[field].widget.attrs.update({
                 'class': (
-                    'appearance-none block w-full bg-gray-200 '
-                    'text-gray-700 border border-gray-200 '
-                    'rounded py-3 px-4 leading-tight '
-                    'focus:outline-none focus:bg-white '
-                    'focus:border-gray-500'
+                    'py-2 px-3 pr-11 block w-full border border-gray-200 shadow-sm text-sm rounded-lg focus:border-blue-500 focus:ring-blue-500 dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400'
                 )
             })
 
@@ -107,11 +100,7 @@ class SavingAccountRegistrationForm(UserCreationForm):  # *LIDL* ? solution so f
         for field in self.fields:
             self.fields[field].widget.attrs.update({
                 'class': (
-                    'appearance-none block w-full bg-gray-200 '
-                    'text-gray-700 border border-gray-200 '
-                    'rounded py-3 px-4 leading-tight '
-                    'focus:outline-none focus:bg-white '
-                    'focus:border-gray-500'
+                    'py-2 px-3 pr-11 block w-full border border-gray-200 shadow-sm text-sm rounded-lg focus:border-blue-500 focus:ring-blue-500 dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400'
                 )
             })
 
@@ -142,10 +131,6 @@ class SavingAccountForm(forms.ModelForm):
         for field in self.fields:
             self.fields[field].widget.attrs.update({
                 'class': (
-                    'appearance-none block w-full bg-gray-200 '
-                    'text-gray-700 border border-gray-200 '
-                    'rounded py-3 px-4 leading-tight '
-                    'focus:outline-none focus:bg-white '
-                    'focus:border-gray-500'
+                    'py-2 px-3 pr-11 block w-full border border-gray-200 shadow-sm text-sm rounded-lg focus:border-blue-500 focus:ring-blue-500 dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400'
                 )
             })
