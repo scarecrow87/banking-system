@@ -7,6 +7,10 @@ from .models import User, BankAccountType, UserBankAccount, UserAddress
 from .constants import GENDER_CHOICE
 
 
+class DateInput(forms.DateInput):
+    input_type = 'date'
+
+
 class UserAddressForm(forms.ModelForm):
 
     class Meta:
@@ -37,7 +41,7 @@ class UserRegistrationForm(UserCreationForm):
         queryset=BankAccountType.objects.all()
     )
     gender = forms.ChoiceField(choices=GENDER_CHOICE)
-    birth_date = forms.DateField()
+    birth_date = forms.DateField(widget=DateInput)
 
     class Meta:
         model = User
@@ -128,6 +132,7 @@ class SavingAccountForm(forms.ModelForm):
     class Meta:
         model = UserBankAccount
         fields = ['account_type', 'gender', 'birth_date','saving_goal']
+        widgets = {'birth_date' : DateInput()}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
