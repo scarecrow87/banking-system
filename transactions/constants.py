@@ -4,6 +4,8 @@ INTEREST = 3
 TRANSFER = 4
 WITHDRAWALFSA = 5
 DEPOSITTSA = 6
+LOAN = 7
+REPAYMENT = 8
 
 TRANSACTION_TYPE_CHOICES = (
     (DEPOSIT, 'Deposit'),
@@ -12,4 +14,6 @@ TRANSACTION_TYPE_CHOICES = (
     (TRANSFER, 'Transfer'),
     (WITHDRAWALFSA, 'Withdrawal from SA'),
     (DEPOSITTSA, 'Deposit to SA'),
+    (LOAN, 'Loan'),
+    (REPAYMENT, 'Repayment to bank'),
 )

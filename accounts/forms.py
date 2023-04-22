@@ -54,7 +54,7 @@ class UserRegistrationForm(UserCreationForm):
         super().__init__(*args, **kwargs)
 
         # Filter account types to show only those with is_saving_account=False
-        self.fields['account_type'].queryset = BankAccountType.objects.filter(is_saving_account=False)
+        self.fields['account_type'].queryset = BankAccountType.objects.filter(is_debet_account=True)
 
         for field in self.fields:
             self.fields[field].widget.attrs.update({
@@ -132,5 +132,28 @@ class SavingAccountForm(forms.ModelForm):
             self.fields[field].widget.attrs.update({
                 'class': (
                     'py-2 px-3 pr-11 block w-full border border-gray-200 shadow-sm text-sm rounded-lg focus:border-blue-500 focus:ring-blue-500 dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400'
+                )
+            })
+
+
+class LoanForm(forms.ModelForm):
+    class Meta:
+        model = UserBankAccount
+        fields = ['account_type', 'gender', 'birth_date']
+        widgets = {'birth_date': DateInput()}
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields['account_type'].queryset = BankAccountType.objects.filter(is_loan=True)
+
+        for field in self.fields:
+            self.fields[field].widget.attrs.update({
+                'class': (
+                    'appearance-none block w-full bg-gray-200 '
+                    'text-gray-700 border border-gray-200 '
+                    'rounded py-3 px-4 leading-tight '
+                    'focus:outline-none focus:bg-white '
+                    'focus:border-gray-500'
                 )
             })

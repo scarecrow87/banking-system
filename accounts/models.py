@@ -1,6 +1,7 @@
 from decimal import Decimal
 
 from django.contrib.auth.models import AbstractUser
+from django.core.exceptions import ValidationError
 from django.core.validators import (
     MinValueValidator,
     MaxValueValidator,
@@ -33,44 +34,124 @@ class User(AbstractUser):
 class BankAccountType(models.Model):
     name = models.CharField(max_length=128)
 
+    is_debet_account = models.BooleanField(default=True)
+    is_saving_account = models.BooleanField(default=False)
+    is_loan = models.BooleanField(default=False)
+
     maximum_withdrawal_amount = models.DecimalField(
         decimal_places=2,
-        max_digits=12
+        max_digits=12,
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(0)]
     )
+
     annual_interest_rate = models.DecimalField(
-        validators=[MinValueValidator(0), MaxValueValidator(100)],
         decimal_places=2,
         max_digits=5,
-        help_text='Interest rate from 0 - 100'
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(0), MaxValueValidator(100)]
     )
+
     interest_calculation_per_year = models.PositiveSmallIntegerField(
-        validators=[MinValueValidator(1), MaxValueValidator(12)],
-        help_text='The number of times interest will be calculated per year'
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(1), MaxValueValidator(12)]
     )
 
-    is_debet_account = models.BooleanField(default=True)
+    loan_principal = models.DecimalField(
+        decimal_places=2,
+        max_digits=12,
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(0)]
+    )
 
-    is_saving_account = models.BooleanField(default=False)
+    loan_interest_rate = models.DecimalField(
+        decimal_places=2,
+        max_digits=5,
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(0), MaxValueValidator(100)]
+    )
 
-    is_loan = models.BooleanField(default=False)
+    loan_length = models.PositiveSmallIntegerField(
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(1)]
+    )
+
+    def clean(self):
+        # At least one account type must be set
+        if not any([self.is_debet_account, self.is_saving_account, self.is_loan]):
+            raise ValidationError("At least one account type must be selected.")
+
+        # If is_debit_account is True, maximum_withdrawal_amount is required
+        if self.is_debet_account and not self.maximum_withdrawal_amount:
+            raise ValidationError("Maximum withdrawal amount is required for debit account.")
+
+        # If is_saving_account is True, maximum_withdrawal_amount,
+        # annual_interest_rate, and interest_calculation_per_year are required
+        if self.is_saving_account and not all([self.maximum_withdrawal_amount,
+                                               self.annual_interest_rate,
+                                               self.interest_calculation_per_year]):
+            raise ValidationError("Maximum withdrawal amount, annual interest rate, and "
+                                  "interest calculation per year are required for saving account.")
+
+        # If is_loan is True, loan_principal, loan_interest_rate, and loan_length are required
+        if self.is_loan and not all([self.loan_principal, self.loan_interest_rate, self.loan_length]):
+            raise ValidationError("Loan principal, loan interest rate and loan length  are required "
+                                  "for loan account.")
 
     def __str__(self):
         return self.name
 
-    def calculate_interest(self, principal):
+    def calculate_interest(self):
         """
-        Calculate interest for each account type.
+        Calculate interest for a saving account.
 
-        This uses a basic interest calculation formula
+        This uses a basic interest calculation formula.
         """
-        p = principal
+        if not self.is_saving_account:
+            return None
+
+        p = self.maximum_withdrawal_amount
         r = self.annual_interest_rate
         n = Decimal(self.interest_calculation_per_year)
 
-        # Basic Future Value formula to calculate interest
+        # Basic future value formula to calculate interest
         interest = (p * (1 + ((r / 100) / n))) - p
 
         return round(interest, 2)
+
+    def loan_interest(self):
+        """
+        Calculate the loan interest rate in percentage.
+        """
+        if not self.is_loan:
+            return None
+
+        P = float(self.loan_principal)
+        r = float(self.loan_interest_rate) / 100
+        n = float(self.loan_length)
+
+        # M = P * (r * (1 + r) ** n) / ((1 + r) ** n - 1)
+
+        return Decimal(P * r)
+
+    def loan_expected_repayment(self):
+        """
+        Calculate the loan interest rate in percentage.
+        """
+        if not self.is_loan:
+            return None
+
+        P = float(self.loan_principal)
+        r = float(self.loan_interest_rate) / 100
+        n = float(self.loan_length)
+
+        return Decimal(P * r * n)
 
 
 class UserBankAccount(models.Model):
@@ -87,11 +168,21 @@ class UserBankAccount(models.Model):
     account_no = models.PositiveIntegerField(unique=True)
     gender = models.CharField(max_length=1, choices=GENDER_CHOICE)
     birth_date = models.DateField(null=True, blank=True)
+
     saving_goal = models.DecimalField(
         decimal_places=2,
         max_digits=12,
         default=2000
     )
+
+    repayment = models.DecimalField(
+        decimal_places=2,
+        max_digits=12,
+        validators=[MinValueValidator(0)],
+        default=0,
+        editable=False
+    )
+
     balance = models.DecimalField(
         default=0,
         max_digits=12,

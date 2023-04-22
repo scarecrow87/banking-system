@@ -104,7 +104,8 @@ class TransferForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.fields['account_to'].queryset = UserBankAccount.objects.all() # luxusne query
+        self.fields['account_to'].queryset = UserBankAccount.objects.filter(
+            account_type__is_debet_account=True)  # luxusne query
 
         for field in self.fields:
             self.fields[field].widget.attrs.update({

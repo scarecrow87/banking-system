@@ -9,9 +9,9 @@ from django.views.generic import RedirectView
 import requests
 import random
 from banking_system.settings import ACCOUNT_NUMBER_START_FROM
-from transactions.constants import DEPOSITTSA, WITHDRAWALFSA
-from transactions.models import Transaction, SavingTransaction
-from .forms import UserRegistrationForm, UserAddressForm
+from transactions.constants import DEPOSITTSA, WITHDRAWALFSA, LOAN, REPAYMENT
+from transactions.models import Transaction, SavingTransaction, LoanTransaction
+from .forms import UserRegistrationForm, UserAddressForm, LoanForm
 from .models import User
 from django.contrib.auth import authenticate
 from django.views.generic import TemplateView
@@ -19,6 +19,7 @@ from django.contrib import messages
 from django.shortcuts import render, redirect
 from .forms import SavingAccountForm
 from .models import UserBankAccount, BankAccountType
+from decimal import Decimal
 
 User = get_user_model()
 
@@ -72,31 +73,6 @@ class UserRegistrationView(TemplateView):
             kwargs['address_form'] = UserAddressForm()
 
         return super().get_context_data(**kwargs)
-
-
-class UserRegistrationSavingAccountView(View):
-    template_name = 'accounts/create_saving_account.html'
-    form_class = SavingAccountForm
-
-    def get(self, request, account_id):
-        user = request.user
-        account = UserBankAccount.objects.get(user_id=user.id)
-        account_type = BankAccountType.objects.get(is_saving_account=True)
-
-        initial_data = {
-            'user': account.user,
-            'account_type': account_type,
-            'account_no': account.account_no,
-            'gender': account.gender,
-            'birth_date': account.birth_date,
-            'balance': 0,
-            'interest_start_date': account.interest_start_date,
-            'initial_deposit_date': account.initial_deposit_date
-        }
-
-        form = self.form_class(initial=initial_data)
-
-        return render(request, self.template_name, {'form': form})
 
 class UserLoginView(LoginView):
     template_name = 'accounts/user_login.html'
@@ -198,21 +174,24 @@ def send_otp(email):
     print(response)
 
 
+class UserRegistrationSavingAccountView(View):
+    template_name = 'accounts/create_saving_account.html'
+    form_class = SavingAccountForm
+
+    def get(self, request):
+        form = self.form_class()
+        return render(request, self.template_name, {'form': form})
+
+
 class UserSavingAccountView(TemplateView):
     template_name = 'transactions/transaction_savings.html'
-
-    # def get_context_data(self, **kwargs):
-    #     context = super().get_context_data(**kwargs)
-    #     context['balance'] = self.request.user.account.balance
-    #     context["interest_rate"] = self.request.user.account.account_type.annual_interest_rate
-    #     return context
 
     def get(self, request, *args, **kwargs):
         accountDebet = self.request.user.accounts.first()
         accountSaving = self.request.user.accounts.filter(account_type__is_saving_account=True).first()
         if (accountSaving == None):
             savings_view = UserRegistrationSavingAccountView.as_view()
-            return savings_view(request, account_id=request.GET.get("account_id"))
+            return savings_view(request)
         balance = accountDebet.balance
         savings_balance = accountSaving.balance
         interest_rate = accountSaving.account_type.annual_interest_rate
@@ -230,11 +209,15 @@ class UserSavingAccountView(TemplateView):
         if UserBankAccount.objects.filter(user_id=user.id, account_type__is_saving_account=True).exists() is not True:
             form = SavingAccountForm(request.POST)
             if form.is_valid():
+
+                if form.cleaned_data['birth_date'] != self.request.user.accounts.first().birth_date:
+                    messages.error(request, "Credentials are invalid!")
+                    return HttpResponseRedirect("/accounts/savings/")
                 # Save the new saving account
                 saving_account = form.save(commit=False)
                 saving_account.interest_start_date = datetime.datetime.now()
                 saving_account.account_no = ACCOUNT_NUMBER_START_FROM + (
-                            random.randint(1, 1000) * random.randint(1, 1000))
+                        random.randint(1, 1000) * random.randint(1, 1000))
                 saving_account.user = self.request.user
                 saving_account.save()
 
@@ -250,7 +233,7 @@ class UserSavingAccountView(TemplateView):
         accountDebet = self.request.user.accounts.first()
         accountSaving = self.request.user.accounts.filter(account_type__is_saving_account=True).first()
         if 'depositToSavingAcc' in request.POST:
-            amount = int(request.POST.get('depositToSavingAcc'))
+            amount = Decimal(request.POST.get('depositToSavingAcc'))
 
             # if not account.initial_deposit_date:
             #     now = timezone.now()
@@ -323,7 +306,7 @@ class UserSavingAccountView(TemplateView):
 
             return render(request, 'transactions/transaction_savings.html', context)
         elif 'withdrawFromSavingAccount' in request.POST:
-            amount = int(request.POST.get('withdrawFromSavingAccount'))
+            amount = Decimal(request.POST.get('withdrawFromSavingAccount'))
 
             if amount <= 0:
                 messages.error(request, "Invalid operation.")
@@ -391,3 +374,150 @@ class UserSavingAccountView(TemplateView):
                 'interest_rate': interest_rate,
             }
             return render(request, 'transactions/transaction_savings.html', context)
+
+
+class UserLoanView(View):
+    loan_create_template = 'accounts/create_loan.html'
+    form_class = LoanForm
+
+    loan_template_name = 'accounts/transaction_loan.html'
+
+    def get(self, request):
+        user_loan = self.request.user.accounts.filter(account_type__is_loan=True).first()
+        if (user_loan == None):
+            form = self.form_class()
+            return render(request, self.loan_create_template, {'form': form})
+        else:
+
+            if user_loan.repayment >= round(user_loan.account_type.loan_expected_repayment(), 2):
+                can_delete_loan = True
+            else:
+                can_delete_loan = False
+
+            context = {
+                'loan_no': user_loan.account_no,
+                'loan_principal': user_loan.account_type.loan_principal,
+                'loan_expected_repayment': round(user_loan.account_type.loan_expected_repayment(), 2),
+                'loan_repayment': user_loan.repayment,
+                'loan_interest_rate': user_loan.account_type.loan_interest_rate,
+                'loan_length': user_loan.account_type.loan_length,
+                "can_delete_loan": can_delete_loan,
+            }
+            return render(request, 'transactions/transaction_loan.html', context)
+
+    def post(self, request, *args, **kwargs):
+        user = request.user
+
+        if UserBankAccount.objects.filter(user_id=user.id, account_type__is_loan=True).exists() is not True:
+            form = LoanForm(request.POST)
+            if form.is_valid():
+
+                if form.cleaned_data['birth_date'] != self.request.user.accounts.first().birth_date:
+                    messages.error(request, "Credentials are invalid!")
+                    return HttpResponseRedirect("/accounts/loan/")
+                # Save the new saving account
+                new_loan = form.save(commit=False)
+                new_loan.interest_start_date = datetime.datetime.now()
+                new_loan.account_no = ACCOUNT_NUMBER_START_FROM + (
+                        random.randint(1, 1000) * random.randint(1, 1000))
+                new_loan.user = self.request.user
+                new_loan.save()
+
+                accountDebet = self.request.user.accounts.first()
+                accountDebet.balance += new_loan.account_type.loan_principal
+                accountDebet.save(
+                    update_fields=[
+                        'balance'
+                    ]
+                )
+
+                created_transactions = []
+                created_transactionsLoan = []
+                transaction_obj = Transaction(
+                    account=accountDebet,
+                    transaction_type=LOAN,
+                    amount=new_loan.account_type.loan_principal,
+                    balance_after_transaction=accountDebet.balance
+                )
+                transaction_objLoan = Transaction(
+                    account=new_loan,
+                    transaction_type=LOAN,
+                    amount=-new_loan.account_type.loan_principal,
+                    balance_after_transaction=-new_loan.balance
+                )
+                created_transactions.append(transaction_obj)
+                created_transactionsLoan.append(transaction_objLoan)
+                if created_transactions:
+                    Transaction.objects.bulk_create(created_transactions)
+                    LoanTransaction.objects.bulk_create(created_transactionsLoan)
+
+                return HttpResponseRedirect("/accounts/dashboard/")
+
+            else:
+                # If the request method is not POST, display the form
+                form = LoanForm()
+
+            return render(request, 'accounts/create_loan.html', {'form': form})
+        else:
+            if request.POST.get('deleting_loan') == 'true':
+                user_loan = self.request.user.accounts.filter(account_type__is_loan=True).first()
+                user_loan.delete()
+                return HttpResponseRedirect("/accounts/dashboard/")
+            repayment = Decimal(request.POST.get('insta_repayment'))
+            if repayment:
+                user_debet_account = self.request.user.accounts.first()
+                user_loan = self.request.user.accounts.filter(account_type__is_loan=True).first()
+                if user_loan.repayment < round(user_loan.account_type.loan_expected_repayment(), 2):
+                    need_to_repay = round(user_loan.account_type.loan_expected_repayment(), 2) - user_loan.repayment
+                    if repayment > need_to_repay:
+                        messages.error(request, f"You only need to pay {need_to_repay}.")
+                    else:
+                        if (user_debet_account.balance >= repayment):
+                            user_loan.repayment += repayment
+                            user_debet_account.balance -= repayment
+                            user_debet_account.save(
+                                update_fields=[
+                                    'balance'
+                                ]
+                            )
+                            user_loan.save(
+                                update_fields=[
+                                    'repayment'
+                                ]
+                            )
+
+                            created_transactions = []
+                            created_transactionsLoan = []
+                            transaction_obj = Transaction(
+                                account=user_debet_account,
+                                transaction_type=REPAYMENT,
+                                amount=-repayment,
+                                balance_after_transaction=user_debet_account.balance
+                            )
+                            transaction_objLoan = Transaction(
+                                account=user_loan,
+                                transaction_type=REPAYMENT,
+                                amount=repayment,
+                                balance_after_transaction=user_loan.balance
+                            )
+                            created_transactions.append(transaction_obj)
+                            created_transactionsLoan.append(transaction_objLoan)
+                            if created_transactions:
+                                Transaction.objects.bulk_create(created_transactions)
+                                LoanTransaction.objects.bulk_create(created_transactionsLoan)
+                                messages.success(
+                                    self.request,
+                                    f'{repayment}$ was paid back to bank.'
+                                )
+
+                            else:
+                                messages.error(request, "Not enough money on debet account!")
+
+                        print("Nice")
+                else:
+                    messages.success(
+                        self.request,
+                        "You already paid full loan. You can now create another loan if you want by deleting this one."
+                    )
+
+        return HttpResponseRedirect("/accounts/loan/")
