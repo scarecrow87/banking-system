@@ -2,32 +2,37 @@
 {% block head_title %}Banking System{% endblock %}
 
 {% block content %}
-<h1 class="font-mono font-bold text-3xl text-center pb-5 pt-10">Enter OTP</h1>
-<div class="bg-white mt-10 shadow-md rounded">
-    <form method="post" class="bg-white flex justify-center items-center  px-8 pt-6 pb-3 ">
-        {% csrf_token %}
-
-
-
-        <div class="flex items-center justify-between">
-            <div class="mb-4">
-                <label for="otp" class="mr-2">Enter 6-digit OTP:</label>
-                <input maxlength="6" class="border rounded px-3 py-2 w-32 text-center" name="otp" id="otp" type="text">
-            </div>
-            <button class="bg-blue-500 ml-2 mb-3 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
-                Submit
-            </button>
-
+<div class="w-full max-w-md mx-auto p-6">
+    <div class="bg-white border border-gray-200 rounded-xl shadow-sm dark:bg-gray-800 dark:border-gray-700 p-4 sm:p-7 sm:max-w-lg sm:w-full mx-auto">
+        <div class="text-center">
+            <h3 class="mb-2 text-2xl font-bold text-gray-800 dark:text-gray-200">
+                Enter OTP
+            </h3>
         </div>
-    </form>
-    <form method="post" class="bg-white flex justify-center items-center shadow-md rounded">
-        {% csrf_token %}
-        <div class="flex items-center justify-between">
-            <button class="text-black font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
-                Regenerate OTP
-            </button>
-
+        <div class="my-6">
+            <form method="post">
+                {% csrf_token %}
+                <div class="grid gap-y-4">
+                    <div>
+                        <label for="otp" class="block text-sm mb-2 dark:text-white">Enter 6-digit OTP</label>
+                        <div class="relative">
+                            <input maxlength="6" class="py-3 px-4 block w-full border border-gray-200 rounded-md text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400" name="otp" id="otp" type="text">
+                        </div>
+                    </div>
+                    <button type="submit" class="py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md border border-transparent font-semibold bg-blue-500 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all text-sm dark:focus:ring-offset-gray-800">
+                        Submit
+                    </button>
+                </div>
+            </form>
         </div>
-    </form>
+        <div class="flex items-center justify-center">
+            <form method="post">
+                {% csrf_token %}
+                <button class="m-1 py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md border font-medium bg-white text-gray-700 shadow-sm align-middle hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-blue-600 transition-all text-sm dark:bg-slate-900 dark:hover:bg-slate-800 dark:border-gray-700 dark:text-gray-400 dark:hover:text-white dark:focus:ring-offset-gray-800" type="submit">
+                    <span class="material-icons">refresh</span>Regenerate OTP
+                </button>
+            </form>
+        </div>
+    </div>
 </div>
 {% endblock %}
