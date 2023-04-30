@@ -150,6 +150,6 @@ class LoanForm(forms.ModelForm):
         for field in self.fields:
             self.fields[field].widget.attrs.update({
                 'class': (
-                    'py-2 px-3 pr-11 block w-full border border-gray-200 shadow-sm text-sm rounded-lg focus:border-blue-500 focus:ring-blue-500 dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400'
+                    'py-3 px-4 block w-full border border-gray-200 rounded-md text-sm focus:border-blue-500 focus:ring-blue-500 sm:p-4 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400'
                 )
             })
