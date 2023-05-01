@@ -10,40 +10,104 @@
             {% endfor %}
         </ul>
     {% endif %}
+    <div class="max-w-2xl mx-auto text-center pt-20 pb-6 lg:pb-16">
+        <h2 class="text-2xl font-bold sm:text-3xl md:text-4xl dark:text-white">Your current loan:
+            no. {{ loan_no }}</h2>
+    </div>
+    <div class="max-w-[85rem] px-4 py-10 sm:px-6 lg:px-8 lg:py-14 mx-auto">
+        <div class="grid sm:grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
 
-    <h1 class=" font-bold text-3xl text-center pb-5 pt-10">Your current loan :
-        no. {{ loan_no }}</h1>
-    <p class=" text-xl text-center pb-5 ">Loan principal: {{ loan_principal }} $</p>
-    <p class=" text-xl text-center pb-5 ">Expected repayment: {{ loan_expected_repayment }} $</p>
-    <p class=" text-xl text-center pb-5 ">Current repayment: {{ loan_repayment }} $</p>
-    <p class=" text-xl text-center pb-5 ">Loan length: {{ loan_length }} (Months)</p>
-    <p class=" text-xl text-center pb-5 ">Loan interest rate: {{ loan_interest_rate }} %</p>
+            <div class="flex flex-col bg-white border shadow-sm rounded-xl dark:bg-slate-900 dark:border-gray-800">
+                <div class="p-4 md:p-5">
+                    <div class="flex items-center gap-x-2">
+                        <p class="text-xs uppercase tracking-wide text-gray-500">Loan principal:</p>
+                    </div>
+                    <div class="mt-1 flex items-center">
+                        <h3 class="text-xl sm:text-2xl font-medium text-gray-800 dark:text-gray-200">${{ loan_principal }}</h3>
+                    </div>
+                </div>
+            </div>
 
+            <div class="flex flex-col bg-white border shadow-sm rounded-xl dark:bg-slate-900 dark:border-gray-800">
+                <div class="p-4 md:p-5">
+                    <div class="flex items-center gap-x-2">
+                        <p class="text-xs uppercase tracking-wide text-gray-500">Expected repayment:</p>
+                    </div>
+                    <div class="mt-1 flex items-center">
+                        <h3 class="text-xl sm:text-2xl font-medium text-gray-800 dark:text-gray-200">${{ loan_expected_repayment }}</h3>
+                    </div>
+                </div>
+            </div>
 
-    <hr>
+            <div class="flex flex-col bg-white border shadow-sm rounded-xl dark:bg-slate-900 dark:border-gray-800">
+                <div class="p-4 md:p-5">
+                    <div class="flex items-center gap-x-2">
+                        <p class="text-xs uppercase tracking-wide text-gray-500">Current repayment:</p>
+                    </div>
+                    <div class="mt-1 flex items-center">
+                        <h3 class="text-xl sm:text-2xl font-medium text-gray-800 dark:text-gray-200">${{ loan_repayment }}</h3>
+                    </div>
+                </div>
+            </div>
 
-    <br>
-    <p class=" text-xl text-left pb-1 ">Pay back immediately :</p>
-    <form id=depositSavingAccount method="post" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
-        {% csrf_token %}
+            <div class="flex flex-col bg-white border shadow-sm rounded-xl dark:bg-slate-900 dark:border-gray-800">
+                <div class="p-4 md:p-5">
+                    <div class="flex items-center gap-x-2">
+                        <p class="text-xs uppercase tracking-wide text-gray-500">Loan length:</p>
+                    </div>
+                    <div class="mt-1 flex items-center">
+                        <h3 class="text-xl sm:text-2xl font-medium text-gray-800 dark:text-gray-200">{{ loan_length }} (Months)</h3>
+                    </div>
+                </div>
+            </div>
 
-        <div class="mb-4">
-            <label class="block text-gray-700 text-sm font-bold mb-2" for="amount">
-                Amount
-            </label>
-            <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight border rounded-md border-gray-500 focus:outline-none focus:shadow-outline"
-                   name="insta_repayment" type="text" required placeholder="Amount">
+            <div class="flex flex-col bg-white border shadow-sm rounded-xl dark:bg-slate-900 dark:border-gray-800">
+                <div class="p-4 md:p-5">
+                    <div class="flex items-center gap-x-2">
+                        <p class="text-xs uppercase tracking-wide text-gray-500">Loan interest rate:</p>
+                    </div>
+                    <div class="mt-1 flex items-center">
+                        <h3 class="text-xl sm:text-2xl font-medium text-gray-800 dark:text-gray-200">{{ loan_interest_rate }}%</h3>
+                    </div>
+                </div>
+            </div>
+
         </div>
-        {% if form.amount.errors %}
-            {% for error in form.amount.errors %}
-                <p class="text-red-600 text-sm italic pb-2">{{ error }}</p>
-            {% endfor %}
-        {% endif %}
-        <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                type="submit">
-            Submit
-        </button>
-    </form>
+    </div>
+
+    <div class="max-w-[85rem] px-4 py-10 sm:px-6 lg:px-8 lg:py-14 mx-auto">
+        <div class="mx-auto max-w-2xl">
+            <div class="text-center">
+                <h2 class="text-xl text-gray-800 font-bold sm:text-3xl dark:text-white">Pay back immediately:</h2>
+            </div>
+            <div class="mt-5 p-4 relative z-10 bg-white border rounded-xl sm:mt-10 md:p-10 dark:bg-gray-800 dark:border-gray-700">
+                <form id=depositSavingAccount method="post">
+                    {% csrf_token %}
+
+                    <div class="mb-4 sm:mb-8">
+                        <label class="block mb-2 text-sm font-medium dark:text-white" for="amount">
+                            Amount
+                        </label>
+                        <input class="py-3 px-4 block w-full border border-gray-200 rounded-md text-sm focus:border-blue-500 focus:ring-blue-500 sm:p-4 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400"
+                               name="insta_repayment" type="text" required placeholder="Amount">
+                    </div>
+
+                    {% if form.amount.errors %}
+                        {% for error in form.amount.errors %}
+                            <p class="text-red-600 text-sm italic pb-2">{{ error }}</p>
+                        {% endfor %}
+                    {% endif %}
+
+                    <div class="mt-6 grid">
+                        <button class="py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md border border-transparent font-semibold bg-blue-500 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all dark:focus:ring-offset-gray-800"
+                                type="submit">
+                            Submit
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
     {% if can_delete_loan %}
         <form method="post">
