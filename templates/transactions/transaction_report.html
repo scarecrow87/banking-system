@@ -21,23 +21,30 @@
                         account_balance_wallet
                     </span>
                         <div class="ml-4">
-                            <p class="text-xl font-bold text-gray-800 dark:text-gray-200">{{ account_type }} account </p>
+                            <p class="text-xl font-bold text-gray-800 dark:text-gray-200">{{ account_type }}
+                                account </p>
                             <p class="text-sm text-gray-500">{{ account_no }} </p>
                         </div>
                 </article>
-
                 <div class="flex flex-col border border-gray-200 text-center rounded-xl p-8 dark:border-gray-700">
                     <p class="font-medium text-lg text-gray-800 dark:text-gray-200">
                         <span class="material-icons mr-4">
                             account_balance
                         </span> Current Balance:
                     </p>
-                    <p class="mt-5 font-bold text-2xl text-gray-800 dark:text-gray-200">{{ account_balance }}€</p>
+                    {% if acc.account_type.is_loan %}
+
+                        <p class="mt-5 font-bold text-2xl text-gray-800 dark:text-gray-200">{{ acc.repayment }}€
+                            / {{ expected_repayment }}€</p>
+                    {% else %}
+                        <p class="mt-5 font-bold text-2xl text-gray-800 dark:text-gray-200">{{ account_balance }}€</p>
+                    {% endif %}
                 </div>
 
                 <canvas id="myChart" height="300" class="my-4 p-2 bg-white rounded-md"></canvas>
 
-                <div id="month-data" class="flex flex-col border border-gray-200 text-center rounded-xl p-4 dark:border-gray-700">
+                <div id="month-data"
+                     class="flex flex-col border border-gray-200 text-center rounded-xl p-4 dark:border-gray-700">
 
                 </div>
                 {% if account_type.name == "Savings" %}
@@ -213,14 +220,22 @@
                                                                 {{ transaction.get_transaction_type_display }}
                                                             </p>
                                                             <p class="text-sm text-gray-600 dark:text-gray-400">
-                                                                At RANDOM ATM
+                                                                From ATM in Aupark Shopping Centre
+                                                            </p>
+                                                        {% elif transaction.get_transaction_type_display == "Interest" %}
+                                                            <p class="text-sm text-gray-600 dark:text-gray-400">
+                                                                {{ transaction.get_transaction_type_display }}
+                                                            </p>
+                                                            <p class="text-sm text-gray-600 dark:text-gray-400">
+                                                                Interest payment from bank to your saving account
                                                             </p>
                                                         {% elif transaction.get_transaction_type_display == "Loan" %}
                                                             <p class="text-sm text-gray-600 dark:text-gray-400">
                                                                 {{ transaction.get_transaction_type_display }}
                                                             </p>
                                                             <p class="text-sm text-gray-600 dark:text-gray-400">
-                                                                Money transfered from bank to your account by taking loan.
+                                                                Money transfered from bank to your account after
+                                                                creating new loan
                                                             </p>
                                                         {% elif transaction.get_transaction_type_display == "Repayment to bank" %}
                                                             <p class="text-sm text-gray-600 dark:text-gray-400">
@@ -261,8 +276,6 @@
                     <button class="text-white font-bold py-2 px-4 rounded"
                             type="submit">
                         <input type="hidden" value={{ account.account_no }} name="account_id">
-
-
                         <article class="flex items-start gap-4 ">
                                      <span class="material-icons bg-blue-500 p-2 rounded-full">
                                             {% if account.account_type.name == "Savings" %}
@@ -272,8 +285,17 @@
                                             {% endif %}
                                         </span>
                             <div class="text-left">
-                                <p class="text-sm text-gray-800 dark:text-gray-200">{{ account.account_type }} account </p>
-                                <p class="text-2xl font-medium text-green-400">{{ account.balance }}€</p>
+                                <p class="text-sm text-gray-800 dark:text-gray-200">{{ account.account_type }}
+                                    account </p>
+                                <p class="text-2xl font-medium text-green-400">
+                                    {% if account.account_type.is_saving_account %}
+                                        {{ account.balance }}€
+                                    {% elif account.account_type.is_debet_account %}
+                                        {{ account.balance }}€
+                                    {% elif account.account_type.is_loan %}
+                                        {{ account.repayment }}€
+                                    {% endif %}
+                                </p>
 
                             </div>
                         </article>

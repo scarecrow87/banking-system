@@ -21,7 +21,7 @@ from transactions.forms import (
     WithdrawForm,
     TransferForm
 )
-from transactions.models import Transaction, SavingTransaction
+from transactions.models import Transaction, SavingTransaction, LoanTransaction
 from accounts.models import UserBankAccount
 
 
@@ -47,28 +47,56 @@ class TransactionRepostView(LoginRequiredMixin, ListView):
                 daterange = self.form_data.get("daterange")
                 if request.GET.get("transactions"):
                     if daterange:
-                        transactions = Transaction.objects.filter(account_id=account.id,
-                                                                  timestamp__date__range=daterange)
+                        if account.account_type.is_debet_account:
+                            transactions = Transaction.objects.filter(account_id=account.id,
+                                                                      timestamp__date__range=daterange)
+                        if account.account_type.is_saving_account:
+                            transactions = SavingTransaction.objects.filter(account_id=account.id,
+                                                                            timestamp__date__range=daterange)
+                        if account.account_type.is_loan:
+                            transactions = LoanTransaction.objects.filter(account_id=account.id,
+                                                                          timestamp__date__range=daterange)
                     else:
-                        transactions = Transaction.objects.filter(account_id=account.id)
+                        if account.account_type.is_debet_account:
+                            transactions = Transaction.objects.filter(account_id=account.id)
+                        if account.account_type.is_saving_account:
+                            transactions = SavingTransaction.objects.filter(account_id=account.id)
+                        if account.account_type.is_loan:
+                            transactions = LoanTransaction.objects.filter(account_id=account.id)
                 else:
                     if daterange:
-                        transactions = Transaction.objects.filter(account_id=account.id,
-                                                                  timestamp__date__range=daterange)[:10]
+                        if account.account_type.is_debet_account:
+                            transactions = Transaction.objects.filter(account_id=account.id,
+                                                                      timestamp__date__range=daterange)[:10]
+                        if account.account_type.is_saving_account:
+                            transactions = SavingTransaction.objects.filter(account_id=account.id,
+                                                                            timestamp__date__range=daterange)[:10]
+                        if account.account_type.is_loan:
+                            transactions = LoanTransaction.objects.filter(account_id=account.id,
+                                                                          timestamp__date__range=daterange)[:10]
                     else:
-                        transactions = Transaction.objects.filter(account_id=account.id)[:10]
+                        if account.account_type.is_debet_account:
+                            transactions = Transaction.objects.filter(account_id=account.id)[:10]
+                        if account.account_type.is_saving_account:
+                            transactions = SavingTransaction.objects.filter(account_id=account.id)[:10]
+                        if account.account_type.is_loan:
+                            transactions = LoanTransaction.objects.filter(account_id=account.id)[:10]
 
                 context = self.get_context_data(object_list=transactions)
                 context['account_balance'] = account.balance
                 context['account_no'] = account.account_no
                 context['account_type'] = account.account_type
                 context['accounts'] = accounts
+                context['acc'] = account
+                if account.account_type.is_loan:
+                    context['expected_repayment'] = float(account.account_type.loan_interest_rate) * float(
+                        account.account_type.loan_principal) * float(account.account_type.loan_length) / 100
                 for account in accounts:
                     if account.account_type.is_saving_account:
-                        context["saving_goal"]= account.saving_goal
+                        context["saving_goal"] = account.saving_goal
                         context["interest_rate"] = account.account_type.annual_interest_rate
-                        context['saving_goal_fulfilment'] = account.balance/account.saving_goal*100
-                        if account.balance/account.saving_goal*100 > 100:
+                        context['saving_goal_fulfilment'] = account.balance / account.saving_goal * 100
+                        if account.balance / account.saving_goal * 100 > 100:
                             context['saving_goal_fulfilment'] = 100
                 return render(request, self.template_name, context=context)
             else:

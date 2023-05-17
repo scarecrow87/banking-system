@@ -23,7 +23,7 @@
                         <p class="text-xs uppercase tracking-wide text-gray-500">Loan principal:</p>
                     </div>
                     <div class="mt-1 flex items-center">
-                        <h3 class="text-xl sm:text-2xl font-medium text-gray-800 dark:text-gray-200">${{ loan_principal }}</h3>
+                        <h3 class="text-xl sm:text-2xl font-medium text-gray-800 dark:text-gray-200">{{ loan_principal }}€</h3>
                     </div>
                 </div>
             </div>
@@ -34,7 +34,7 @@
                         <p class="text-xs uppercase tracking-wide text-gray-500">Expected repayment:</p>
                     </div>
                     <div class="mt-1 flex items-center">
-                        <h3 class="text-xl sm:text-2xl font-medium text-gray-800 dark:text-gray-200">${{ loan_expected_repayment }}</h3>
+                        <h3 class="text-xl sm:text-2xl font-medium text-gray-800 dark:text-gray-200">{{ loan_expected_repayment }}€</h3>
                     </div>
                 </div>
             </div>
@@ -45,7 +45,7 @@
                         <p class="text-xs uppercase tracking-wide text-gray-500">Current repayment:</p>
                     </div>
                     <div class="mt-1 flex items-center">
-                        <h3 class="text-xl sm:text-2xl font-medium text-gray-800 dark:text-gray-200">${{ loan_repayment }}</h3>
+                        <h3 class="text-xl sm:text-2xl font-medium text-gray-800 dark:text-gray-200">{{ loan_repayment }}€</h3>
                     </div>
                 </div>
             </div>
@@ -106,18 +106,21 @@
                     </div>
                 </form>
             </div>
+            <div class="mt-6 grid text-center">
+                {% if can_delete_loan %}
+                    <form method="post">
+                        {% csrf_token %}
+                        <button type="submit" name="deleting_loan" value="true"
+                                class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                            DELETE CURRENT LOAN
+                        </button>
+                    </form>
+                {% endif %}
+            </div>
         </div>
     </div>
 
-    {% if can_delete_loan %}
-        <form method="post">
-            {% csrf_token %}
-            <button type="submit" name="deleting_loan" value="true"
-                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                DELETE CURRENT LOAN
-            </button>
-        </form>
-    {% endif %}
+
 
 
 {% endblock %}
