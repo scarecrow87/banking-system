@@ -20,6 +20,8 @@ from django.shortcuts import render, redirect
 from .forms import SavingAccountForm
 from .models import UserBankAccount, BankAccountType
 from decimal import Decimal
+from accounts.credentials_api import password as password_api
+from accounts.credentials_api import username as username_api
 
 User = get_user_model()
 
@@ -45,9 +47,15 @@ class UserRegistrationView(TemplateView):
             address = address_form.save(commit=False)
             address.user = user
             address.save()
+
+            url = 'https://otp-tp.herokuapp.com/api/auth/token'
+            response = requests.post(url, auth=(username_api, password_api))
+            token = response.text
+
             url = 'https://otp-tp.herokuapp.com/api/v1/user'
             payload = {"email": user.email}
-            requests.post(url, json=payload)
+            requests.post(url, json=payload,headers={'Content-Type': 'application/json',
+                                           'Authorization': 'Bearer {}'.format(token)})
             messages.success(
                 self.request,
                 (
@@ -139,8 +147,15 @@ class UserValidationView(TemplateView):
             )
             return render(request, 'accounts/user_otp.html')
 
+        url = 'https://otp-tp.herokuapp.com/api/auth/token'
+
+        response = requests.post(url, auth=(username_api, password_api))
+        token = response.text
+
         url = 'https://otp-tp.herokuapp.com/api/v1/user/otp/validate/' + request.session["email"] + "?otp=" + otp
-        r = requests.get(url)
+        r = requests.get(url, headers={'Content-Type': 'application/json',
+                                                  'Authorization': 'Bearer {}'.format(token)})
+
         if r.status_code == 401:
             messages.error(
                 self.request,
@@ -168,10 +183,13 @@ class UserAccountView(TemplateView):
 
 
 def send_otp(email):
-    url = 'https://otp-tp.herokuapp.com/api/v1/user/otp/generate/' + email
-    print(url)
-    response = requests.get(url)
-    print(response)
+    url = 'https://otp-tp.herokuapp.com/api/auth/token'
+    response = requests.post(url, auth=(username_api, password_api))
+    token = response.text
+
+    url_get = 'https://otp-tp.herokuapp.com/api/v1/user/otp/generate/'+ email
+    response = requests.get(url_get, headers={'Content-Type':'application/json',
+               'Authorization': 'Bearer {}'.format(token)})
 
 
 class UserRegistrationSavingAccountView(View):

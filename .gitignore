@@ -18,6 +18,7 @@ node_modules/
 .coverage
 celerybeat.pid
 celerybeat-schedule
+/accounts/credentials_api.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
