@@ -33,6 +33,7 @@ class User(AbstractUser):
 
 class BankAccountType(models.Model):
     name = models.CharField(max_length=128)
+    description = models.TextField()
 
     is_debet_account = models.BooleanField(default=True)
     is_saving_account = models.BooleanField(default=False)

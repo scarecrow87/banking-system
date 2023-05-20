@@ -97,6 +97,8 @@
                     {% endif %}
                 </div>
 
+                <div id="description" class="col-span-3"></div>
+
                 <div class="col-span-12 border-t border-gray-200 dark:border-gray-700 my-4"></div>
 
                 <div class="col-span-3">
@@ -218,7 +220,8 @@
                 </div>
 
                 <div class="col-span-12 mt-8">
-                    <button type="submit" class="py-3 px-4 w-full inline-flex justify-center items-center gap-2 rounded-md border border-transparent font-semibold bg-blue-500 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all text-sm dark:focus:ring-offset-gray-800">
+                    <button type="submit"
+                            class="py-3 px-4 w-full inline-flex justify-center items-center gap-2 rounded-md border border-transparent font-semibold bg-blue-500 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all text-sm dark:focus:ring-offset-gray-800">
                         Vytvoriť účet
                     </button>
                 </div>
@@ -226,4 +229,34 @@
         </form>
     </div>
 </div>
+
+
+    <script>
+        document.getElementById('id_account_type').addEventListener('change', function () {
+            console.log("POG")
+            var selectElement = this;
+            var selectedOption = selectElement.options[selectElement.selectedIndex];
+            var accountTypeName = selectedOption.value;
+
+            console.log(accountTypeName)
+            if (accountTypeName !== "") {
+                // Make an AJAX request to retrieve the description from the server
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', 'get_account_type_description/?name=' + encodeURIComponent(accountTypeName), true);
+
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+                        var description = xhr.responseText;
+                        var descriptionElement = document.getElementById('description');
+                        descriptionElement.textContent = description;
+                    }
+                };
+
+                xhr.send();
+            } else {
+                var descriptionElement = document.getElementById('description');
+                descriptionElement.textContent = "";
+            }
+        });
+    </script>
 {% endblock %}

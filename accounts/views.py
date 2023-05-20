@@ -2,6 +2,7 @@ import datetime
 
 from django.contrib.auth import get_user_model, login, logout
 from django.contrib.auth.views import LoginView
+from django.http import HttpResponse
 from django.shortcuts import HttpResponseRedirect, render
 from django.urls import reverse_lazy
 from django.views import View
@@ -163,7 +164,7 @@ class UserAccountView(TemplateView):
 
     def get(self, request, *args, **kwargs):
         user = User.objects.get(email=request.session["email"])
-        accounts = UserBankAccount.objects.filter(user_id=user.id, account_type__name="Checking").first()
+        accounts = UserBankAccount.objects.filter(user_id=user.id, account_type__is_debet_account=True).first()
         return HttpResponseRedirect("/transactions/report/?account_id=" + str(accounts.account_no))
 
 
@@ -528,3 +529,10 @@ class UserLoanView(View):
                     )
 
         return HttpResponseRedirect("/accounts/loan/")
+
+
+def get_account_type_description(request):
+    account_type_id = request.GET.get('name')
+    account_type = BankAccountType.objects.filter(id=account_type_id).first()
+    description = account_type.description
+    return HttpResponse(description)

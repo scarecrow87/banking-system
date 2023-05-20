@@ -5,8 +5,36 @@
     <form method="post">
         {% csrf_token %}
         {{ form.as_p }}
+        <div id="description" class="col-span-3"></div>
         <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 mt-2 rounded focus:outline-none focus:shadow-outline"
                 type="submit">Create
         </button>
     </form>
+
+    <script>
+        document.getElementById('id_account_type').addEventListener('change', function () {
+            var selectElement = this;
+            var selectedOption = selectElement.options[selectElement.selectedIndex];
+            var accountTypeName = selectedOption.value;
+            console.log(accountTypeName)
+            if (accountTypeName !== "") {
+                // Make an AJAX request to retrieve the description from the server
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', 'get_account_type_description/?name=' + encodeURIComponent(accountTypeName), true);
+
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+                        var description = xhr.responseText;
+                        var descriptionElement = document.getElementById('description');
+                        descriptionElement.textContent = description;
+                    }
+                };
+
+                xhr.send();
+            } else {
+                var descriptionElement = document.getElementById('description');
+                descriptionElement.textContent = "";
+            }
+        });
+    </script>
 {% endblock %}
