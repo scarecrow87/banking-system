@@ -24,6 +24,7 @@ urlpatterns = [
     path('', HomeView.as_view(), name='home'),
     path('accounts/', include('accounts.urls', namespace='accounts')),
     path('admin/', admin.site.urls),
+    path("ca/", include("django_ca.urls")),
     path(
         'transactions/',
         include('transactions.urls', namespace='transactions')
