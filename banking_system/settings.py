@@ -39,6 +39,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'django_object_actions',
+    'django_ca',
+
     'django_celery_beat',
 
     'accounts',
@@ -106,6 +109,9 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# The hostname used by default for URLs in certificates. Your Django project should be available under this
+# URL using HTTP (see below). If you use ACMEv2, you will also need HTTPS.
+CA_DEFAULT_HOSTNAME = "ca.bank.com"
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/

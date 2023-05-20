@@ -7,4 +7,15 @@
     input::-webkit-calendar-picker-indicator {
         filter: invert(0.6);
     }
+    #create-loan-form label {
+        color: #ffffff;
+    }
+}
+
+#create-loan-form label {
+    display: inline-block;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    font-weight: 500;
+    margin: 0.5rem 0;
 }

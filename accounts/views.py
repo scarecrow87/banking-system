@@ -219,6 +219,8 @@ class UserSavingAccountView(TemplateView):
             'savings_balance': savings_balance,
             'interest_rate': interest_rate,
         }
+        if savings_balance == 0:
+            context['can_delete_saving_acc'] = True
         return render(request, 'transactions/transaction_savings.html', context)
 
     def post(self, request, *args, **kwargs):
@@ -248,6 +250,11 @@ class UserSavingAccountView(TemplateView):
             return render(request, 'accounts/create_saving_account.html', {'form': form})
 
         ###
+        if request.POST.get('deleting_saving_acc') == 'true':
+            user_saving_acc = self.request.user.accounts.filter(account_type__is_saving_account=True).first()
+            user_saving_acc.delete()
+            return HttpResponseRedirect("/accounts/dashboard/")
+
         accountDebet = self.request.user.accounts.first()
         accountSaving = self.request.user.accounts.filter(account_type__is_saving_account=True).first()
         if 'depositToSavingAcc' in request.POST:

@@ -104,6 +104,12 @@ class BankAccountType(models.Model):
             raise ValidationError("Loan principal, loan interest rate and loan length  are required "
                                   "for loan account.")
 
+        if self.loan_principal is not None and self.loan_interest_rate is not None and self.loan_length is not None:
+            requirement = float(self.loan_length) * float(self.loan_interest_rate) * float(self.loan_principal) / 100
+            if requirement < float(self.loan_principal) + float(self.loan_principal) * 0.02:
+                raise ValidationError(
+                    f"Requirement not fulfilled. Loan cannot be created cause repayment ({requirement}) is less than actual loan princicapl.")
+
     def __str__(self):
         return self.name
 
