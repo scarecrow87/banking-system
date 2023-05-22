@@ -362,6 +362,9 @@ class MonthlyReportView(CreateView):
 
     def post(self, request, *args, **kwargs):
         month = request.POST.get("month", 0)
+        for key, val in MONTHS.items():  # for name, age in dictionary.iteritems():  (for Python 2.x)
+            if val == month:
+                month = key + 1
         year = request.POST.get("year", 0)
         months = Transaction.objects.annotate(month=ExtractMonth('timestamp'),
                                               year=ExtractYear('timestamp'), ).order_by().values('month',
