@@ -52,7 +52,7 @@ class UserRegistrationView(TemplateView):
             response = requests.post(url, auth=(username_api, password_api))
             token = response.text
 
-            url = 'https://otp-tp.herokuapp.com/api/v1/user'
+            url = 'https://otp-tp.herokuapp.com/user'
             payload = {"email": user.email}
             requests.post(url, json=payload,headers={'Content-Type': 'application/json',
                                            'Authorization': 'Bearer {}'.format(token)})
@@ -152,7 +152,7 @@ class UserValidationView(TemplateView):
         response = requests.post(url, auth=(username_api, password_api))
         token = response.text
 
-        url = 'https://otp-tp.herokuapp.com/api/v1/user/otp/validate/' + request.session["email"] + "?otp=" + otp
+        url = 'https://otp-tp.herokuapp.com/user/otp/validate/' + request.session["email"] + "?otp=" + otp
         r = requests.get(url, headers={'Content-Type': 'application/json',
                                                   'Authorization': 'Bearer {}'.format(token)})
 
@@ -187,7 +187,7 @@ def send_otp(email):
     response = requests.post(url, auth=(username_api, password_api))
     token = response.text
 
-    url_get = 'https://otp-tp.herokuapp.com/api/v1/user/otp/generate/'+ email
+    url_get = 'https://otp-tp.herokuapp.com/user/otp/generate/'+ email
     response = requests.get(url_get, headers={'Content-Type':'application/json',
                'Authorization': 'Bearer {}'.format(token)})
 

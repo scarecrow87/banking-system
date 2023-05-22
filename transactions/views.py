@@ -103,7 +103,6 @@ class TransactionRepostView(LoginRequiredMixin, ListView):
                 return HttpResponseRedirect("/accounts/dashboard/")
 
         else:
-            print("fgergre")
             return HttpResponseRedirect("/accounts/dashboard/")
 
 
