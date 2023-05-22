@@ -10,9 +10,9 @@
 {% endblock %}
 
 {% block content %}
-    <div class="flex max-sm:flex-col justify-center px-4">
+    <div class="flex flex-col lg:flex-row justify-center px-4">
 
-        <div class="flex flex-col border-2 border-blue-600 text-center shadow-xl rounded-xl p-8 dark:border-blue-700 mt-10 mr-4 w-3/12 max-sm:w-full">
+        <div class="flex flex-col border-2 border-blue-600 text-center shadow-xl rounded-xl p-8 dark:border-blue-700 mt-10 mr-4 lg:w-3/12 w-full h-fit">
 
             <article class="mb-8 inline-flex items-center gap-1.5 py-1.5 rounded-md text-xs uppercase font-semibold text-blue-800 dark:text-white">
                 <span class="material-icons bg-blue-500 p-2 rounded-full">
@@ -87,7 +87,7 @@
             </div>
 
         </div>
-        <div class="w-9/12 max-sm:w-full">
+        <div class="lg:w-9/12 w-full">
             <div class="mt-7 sm:mt-12 mx-auto px-4 sm:px-6 lg:px-8 w-full relative">
                 <form method="get">
                     <div class="relative z-10 flex space-x-3 p-3 bg-white border rounded-lg shadow-lg shadow-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:shadow-gray-900/[.2]">
@@ -268,7 +268,7 @@
     </div>
     <div class="p-4 flex gap-4 max-sm:flex-col">
         {% for account in accounts %}
-            <form class="flex flex-col border-2 border-blue-600 text-center shadow-xl rounded-xl p-8 dark:border-blue-700 mt-10 w-3/12 max-sm:w-full"
+            <form class="flex flex-col border-2 border-blue-600 text-center shadow-xl rounded-xl p-8 dark:border-blue-700 mt-10 md:w-6/12 lg:w-3/12 max-sm:w-full"
                   method="get" action="/transactions/report">
                 <button class="text-white font-bold py-2 px-4 rounded"
                         type="submit">
