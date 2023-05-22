@@ -1,7 +1,7 @@
 from django.urls import path
 
 from .views import DepositMoneyView, WithdrawMoneyView, TransactionRepostView, TransferMoneyView, \
-    SavingsTransactionRepostView, get_data
+    SavingsTransactionRepostView, get_data, MonthlyReportView
 
 app_name = 'transactions'
 
@@ -13,5 +13,6 @@ urlpatterns = [
     path("withdraw/", WithdrawMoneyView.as_view(), name="withdraw_money"),
     path("transfer/", TransferMoneyView.as_view(), name="transfer_money"),
     path("report/data/", get_data, name="get_chart_data"),
+    path("report/monthly/", MonthlyReportView.as_view(), name="monthly_report"),
 
 ]

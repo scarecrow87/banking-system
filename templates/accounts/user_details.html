@@ -1,0 +1,190 @@
+{% extends 'core/base.html' %}
+
+{% block head_title %}Banking System{% endblock %}
+
+{% block content %}
+{% if form.non_field_errors %}
+    {% for error in form.non_field_errors %}
+    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mt-2" role="alert">
+        <p class="font-bold">Error!</p>
+        <p class="block sm:inline">{{ error }}</p>
+    </div>
+    {% endfor %}
+{% endif %}
+{% if address_form.non_field_errors %}
+    {% for error in address_form.non_field_errors %}
+    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mt-2" role="alert">
+        <p class="font-bold">Error!</p>
+        <p class="block sm:inline">{{ error }}</p>
+    </div>
+    {% endfor %}
+{% endif %}
+
+<div class="max-w-4xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14 mx-auto">
+    <div class="bg-white rounded-xl shadow p-4 sm:p-7 dark:bg-slate-900">
+        <div class="mb-8">
+            <h2 class="text-xl font-bold text-gray-800 dark:text-gray-200">
+                Your details
+            </h2>
+            <p class="text-sm text-gray-600 dark:text-gray-400">
+                Update your account details below.
+            </p>
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+            {% for hidden_field in form.hidden_fields %}
+                {{ hidden_field.errors }}
+                {{ hidden_field }}
+            {% endfor %}
+            <div class="grid grid-cols-12 gap-4 sm:gap-6">
+
+                <div class="col-span-3">
+                    <label class="inline-block text-sm text-gray-800 mt-2.5 dark:text-gray-200" for="{{ registration_form.first_name.id_for_label }}">
+                        {{ form.first_name.label }}
+                    </label>
+                </div>
+                <div class="col-span-9">
+                    {{ form.first_name }}
+                    {% if form.first_name.errors %}
+                        {% for error in form.first_name.errors %}
+                            <p class="text-red-600 text-sm italic pb-2">{{ error }}</p>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+
+                <div class="col-span-3">
+                    <label class="inline-block text-sm text-gray-800 mt-2.5 dark:text-gray-200" for="{{ registration_form.last_name.id_for_label }}">
+                        {{ form.last_name.label }}
+                    </label>
+                </div>
+                <div class="col-span-9">
+                    {{ form.last_name }}
+                    {% if form.last_name.errors %}
+                        {% for error in form.last_name.errors %}
+                            <p class="text-red-600 text-sm italic pb-2">{{ error }}</p>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+
+                <div class="col-span-3">
+                    <label class="inline-block text-sm text-gray-800 mt-2.5 dark:text-gray-200" for="{{ registration_form.email.id_for_label }}">
+                        {{ form.email.label }}
+                    </label>
+                </div>
+                <div class="col-span-9">
+                    {{ form.email }}
+                    {% if form.email.errors %}
+                        {% for error in form.email.errors %}
+                            <p class="text-red-600 text-sm italic pb-2">{{ error }}</p>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+
+                <div class="col-span-12 border-t border-gray-200 dark:border-gray-700 my-4"></div>
+
+                <div class="col-span-3">
+                    <label class="inline-block text-sm text-gray-800 mt-2.5 dark:text-gray-200" for="{{ registration_form.gender.id_for_label }}">
+                        {{ form.gender.label }}
+                    </label>
+                </div>
+                <div class="col-span-9">
+                    {{ form.gender }}
+                    {% if form.gender.errors %}
+                        {% for error in form.gender.errors %}
+                            <p class="text-red-600 text-sm italic pb-2">{{ error }}</p>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+
+
+
+
+                <div class="col-span-12 border-t border-gray-200 dark:border-gray-700 my-4"></div>
+
+                {% for hidden_field in address_form.hidden_fields %} {{ hidden_field.errors }} {{ hidden_field }} {% endfor %}
+
+                <div class="col-span-3">
+                    <label class="inline-block text-sm text-gray-800 mt-2.5 dark:text-gray-200" for="{{ address_form.street_address.id_for_label }}">
+                        {{ address_form.street_address.label }}
+                    </label>
+                </div>
+                <div class="col-span-9">
+                    {{ address_form.street_address }}
+                    {% if address_form.street_address.errors %}
+                        {% for error in address_form.street_address.errors %}
+                            <p class="text-red-600 text-sm italic pb-2">{{ error }}</p>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+
+                <div class="col-span-3">
+                    <label class="inline-block text-sm text-gray-800 mt-2.5 dark:text-gray-200" for="{{ address_form.city.id_for_label }}">
+                        {{ address_form.city.label }}
+                    </label>
+                </div>
+                <div class="col-span-9">
+                    {{ address_form.city }}
+                    {% if address_form.city.errors %}
+                        {% for error in address_form.city.errors %}
+                            <p class="text-red-600 text-sm italic pb-2">{{ error }}</p>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+
+                <div class="col-span-3">
+                    <label class="inline-block text-sm text-gray-800 mt-2.5 dark:text-gray-200" for="{{ address_form.postal_code.id_for_label }}">
+                        {{ address_form.postal_code.label }}
+                    </label>
+                </div>
+                <div class="col-span-9">
+                    {{ address_form.postal_code }}
+                    {% if address_form.postal_code.errors %}
+                        {% for error in address_form.postal_code.errors %}
+                            <p class="text-red-600 text-sm italic pb-2">{{ error }}</p>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+
+                <div class="col-span-3">
+                    <label class="inline-block text-sm text-gray-800 mt-2.5 dark:text-gray-200" for="{{ address_form.country.id_for_label }}">
+                        {{ address_form.country.label }}
+                    </label>
+                </div>
+                <div class="col-span-9">
+                    {{ address_form.country }}
+                    {% if address_form.country.errors %}
+                        {% for error in address_form.country.errors %}
+                            <p class="text-red-600 text-sm italic pb-2">{{ error }}</p>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+
+                <div class="col-span-12 mt-8">
+                    <button type="submit"
+                            class="py-3 px-4 w-full inline-flex justify-center items-center gap-2 rounded-md border border-transparent font-semibold bg-blue-500 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all text-sm dark:focus:ring-offset-gray-800">
+                        Update account
+                    </button>
+                </div>
+            </div>
+        {{ messege }}
+        </form>
+    </div>
+    <div class="bg-white rounded-xl shadow p-4 sm:p-7 dark:bg-slate-900 mt-1">
+        <div class="mb-8">
+            <h2 class="text-xl font-bold text-gray-800 dark:text-gray-200">
+                PDF Password
+            </h2>
+            <p class="text-sm text-gray-600 dark:text-gray-400">
+                Here is the password to unlock your PDFs.
+            </p>
+            <input type="text" class="py-3 px-4 block w-full border border-gray-200 rounded-md text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400" disabled value={{ user.pdf_password }}>
+
+        </div>
+
+    </div>
+</div>
+
+
+
+{% endblock %}

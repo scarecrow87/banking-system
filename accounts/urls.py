@@ -1,7 +1,7 @@
 from django.urls import path
 
 from .views import UserRegistrationView, LogoutView, UserLoginView, UserValidationView, UserAccountView, \
-    UserSavingAccountView, UserRegistrationSavingAccountView, UserLoanView, get_account_type_description
+    UserSavingAccountView, UserRegistrationSavingAccountView, UserLoanView, get_account_type_description, UserDetailView
 
 app_name = 'accounts'
 
@@ -32,5 +32,5 @@ urlpatterns = [
     path('loan/get_account_type_description/', get_account_type_description, name='get_account_type_description'),
     path('savings/get_account_type_description/', get_account_type_description, name='get_account_type_description'),
     path('register/get_account_type_description/', get_account_type_description, name='get_account_type_description'),
-
+    path('details', UserDetailView.as_view(), name="edit_user")
 ]

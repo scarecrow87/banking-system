@@ -1,7 +1,14 @@
+import functools
+from io import BytesIO
+
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
-from django.http import JsonResponse
+from django.core.mail import EmailMessage
+from django.db.models import Count
+from django.db.models.functions import ExtractMonth, ExtractYear
+from django.http import JsonResponse, HttpResponse
 from django.utils.safestring import SafeString
+from .constants import TRANSACTION_TYPE_CHOICES
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -13,7 +20,13 @@ from django.shortcuts import HttpResponseRedirect, render
 import pandas as pd
 from datetime import datetime, timedelta
 from django.utils.timezone import make_aware
-
+from reportlab.lib.pagesizes import A4
+from reportlab.platypus import (SimpleDocTemplate, Paragraph, PageBreak, Image, Spacer, Table, TableStyle)
+from reportlab.lib.enums import TA_LEFT, TA_RIGHT, TA_CENTER, TA_JUSTIFY
+from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
+from reportlab.lib.pagesizes import LETTER, inch
+from reportlab.graphics.shapes import Line, LineShape, Drawing
+from reportlab.lib.colors import Color
 from transactions.constants import DEPOSIT, WITHDRAWAL, TRANSFER
 from transactions.forms import (
     DepositForm,
@@ -23,6 +36,22 @@ from transactions.forms import (
 )
 from transactions.models import Transaction, SavingTransaction, LoanTransaction
 from accounts.models import UserBankAccount
+from reportlab.pdfgen import canvas
+
+MONTHS = {
+    0: "Jan",
+    1: "Feb",
+    2: "Mar",
+    3: "Apr",
+    4: "May",
+    5: "June",
+    6: "July",
+    7: "Aug",
+    8: "Sep",
+    9: "Oct",
+    10: "Nov",
+    11: "Dec",
+}
 
 
 class TransactionRepostView(LoginRequiredMixin, ListView):
@@ -313,24 +342,126 @@ class TransferMoneyView(CreateView):
         return render(request, self.template_name, {'form': self.form_class})
 
 
+class MonthlyReportView(CreateView):
+    template_name = 'transactions/monthly_report.html'
+
+    def get(self, request, *args, **kwargs):
+
+        months = Transaction.objects.annotate(month=ExtractMonth('timestamp'),
+                                              year=ExtractYear('timestamp'), ).order_by().values('month',
+                                                                                                 'year').annotate(
+        total=Count('*')).values('month', 'year', 'total').filter(
+        account_id=UserBankAccount.objects.filter(user_id=self.request.user.id).first().id)
+        for data in months:
+            print(data)
+
+            data['month'] = MONTHS[int(data['month'])-1]
+            print(data)
+        context = {'months': months}
+        return render(request, self.template_name, context=context)
+
+    def post(self, request, *args, **kwargs):
+        month = request.POST.get("month", 0)
+        year = request.POST.get("year", 0)
+        months = Transaction.objects.annotate(month=ExtractMonth('timestamp'),
+                                              year=ExtractYear('timestamp'), ).order_by().values('month',
+                                                                                                 'year').annotate(
+            total=Count('*')).values('month', 'year', 'total').filter(
+            account_id=UserBankAccount.objects.filter(user_id=self.request.user.id).first().id)
+        context = {'months': months}
+        account = UserBankAccount.objects.first()
+
+        transactions = Transaction.objects.filter(timestamp__year__gte=year,
+                                                  timestamp__month__gte=month,
+                                                  timestamp__year__lte=year,
+                                                  timestamp__month__lte=month,
+                                                  account_id=account.id)
+
+        buffer = BytesIO()
+
+
+
+        psHeaderText = ParagraphStyle('Hed0', fontSize=12, alignment=TA_LEFT, borderWidth=3)
+        text = 'Monthly Report - ' + MONTHS[int(month)-1]
+        paragraphReportHeader = Paragraph(text, psHeaderText)
+        elements = []
+        elements.append(paragraphReportHeader)
+
+        spacer = Spacer(10, 22)
+        elements.append(spacer)
+        """
+        Create the line items
+        """
+        d = []
+        textData = ["Date", "Type", "Amount"]
+
+        fontSize = 8
+        centered = ParagraphStyle(name="centered", alignment=TA_CENTER)
+        for text in textData:
+            ptext = "<font size='%s'><b>%s</b></font>" % (fontSize, text)
+            titlesTable = Paragraph(ptext, centered)
+            d.append(titlesTable)
+        colorOhkaBlue1 = Color((122.0/255), (180.0/255), (225.0/255), 1)
+        colorOhkaGreenLineas = Color((50.0/255), (140.0/255), (140.0/255), 1)
+        data = [d]
+        lineNum = 1
+        formattedLineData = []
+
+        alignStyle = [ParagraphStyle(name="01", alignment=TA_CENTER),
+                      ParagraphStyle(name="02", alignment=TA_LEFT),
+                      ParagraphStyle(name="03", alignment=TA_CENTER)]
+
+        for item in transactions:
+            columnNumber = 0
+            transaction_type_string = functools.partial(item._get_FIELD_display,
+                                                        field=item._meta.get_field('transaction_type'))()
+            date = item.timestamp.strftime("%Y-%m-%d")
+            amount = str(item.amount) + "€"
+            print(transaction_type_string, date, item.amount)
+            column_data = [date, transaction_type_string, amount]
+            for col in column_data:
+                ptext = "<font size='%s'>%s</font>" % (fontSize - 1, col)
+                p = Paragraph(ptext, alignStyle[columnNumber])
+                formattedLineData.append(p)
+                columnNumber = columnNumber + 1
+            data.append(formattedLineData)
+            formattedLineData = []
+        table = Table(data, colWidths=[50, 200, 80, 80, 80])
+        tStyle = TableStyle([  # ('GRID',(0, 0), (-1, -1), 0.5, grey),
+            ('ALIGN', (0, 0), (0, -1), 'LEFT'),
+            # ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+            ("ALIGN", (1, 0), (1, -1), 'RIGHT'),
+            ('LINEABOVE', (0, 0), (-1, -1), 1, colorOhkaBlue1),
+            ('BACKGROUND', (0, 0), (-1, 0), colorOhkaGreenLineas),])
+
+        table.setStyle(tStyle)
+        elements.append(table)
+        doc = SimpleDocTemplate(buffer, pagesize=LETTER, bottomup=False, encrypt=request.user.pdf_password)
+        doc.multiBuild(elements)
+        pdf = buffer.getvalue()
+        buffer.close()
+        sendMail(request,pdf,month,year)
+        return render(request, self.template_name, context=context)
+
+
+def sendMail(request, pdf, month, year):
+    subject = "Monthly report of payments for " + str(MONTHS[int(month)-1]) +" "+ str(year)
+    message = "Dear Client, \n Please find enclosed your account statement(s) for the past month. \n We are committed to keeping your money and personal information safe with us, which is why we send all statements automatically encrypted. \n You can view your password in online banking."
+    emails = [request.user.email]
+
+    mail = EmailMessage(subject, message, settings.EMAIL_HOST_USER, emails)
+    mail.attach('monthly_report_' + MONTHS[int(month)-1] + "_" + request.user.last_name +'.pdf', pdf, 'application/pdf')
+
+    try:
+        mail.send(fail_silently=False)
+        return HttpResponse("Mail Sent")
+    except:
+        return HttpResponse("Mail Not Sent")
+
+
 def get_data(request):
     account = UserBankAccount.objects.get(account_no=request.GET.get("account_id"))
-    print("su5")
-    MONTHS = {
-        0: "Jan",
-        1: "Feb",
-        2: "Mar",
-        3: "Apr",
-        4: "May",
-        5: "June",
-        6: "July",
-        7: "Aug",
-        8: "Sep",
-        9: "Oct",
-        10: "Nov",
-        11: "Dec",
 
-    }
     if account:
         startdate = make_aware(datetime.today())
         enddate = startdate - timedelta(days=110)

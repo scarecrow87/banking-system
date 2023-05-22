@@ -1,0 +1,72 @@
+{% extends 'core/base.html' %}
+
+{% block head_title %}Monthly report{% endblock %}
+
+{% block head_extra %}
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css"/>
+{% endblock %}
+{% block content %}
+<div class="max-w-4xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14 mx-auto">
+    <div class="bg-white rounded-xl shadow p-4 sm:p-7 dark:bg-slate-900">
+        <div class="mb-8">
+                    <h2 class="text-xl font-bold text-gray-800 dark:text-gray-200">
+                        Monthly report
+                    </h2>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                        Get your transaction report securely by sending it to your email.
+                    </p>
+                </div>
+        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead class="bg-gray-50 dark:bg-slate-900">
+                <tr>
+                    <th scope="col" class="px-6 py-3 text-left">
+                        <div class="flex items-center gap-x-2">
+                        <span class="text-xs font-semibold uppercase tracking-wide text-gray-800 dark:text-gray-200">
+                            Month
+                        </span>
+                        </div>
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-left">
+                        <div class="flex items-center gap-x-2">
+                            <span class="text-xs font-semibold uppercase tracking-wide text-gray-800 dark:text-gray-200">
+                                Send to email
+                            </span>
+                        </div>
+                    </th>
+                </tr>
+            </thead>
+
+            <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                {% for month_data in months %}
+                    <tr class="bg-white hover:bg-gray-50 dark:bg-slate-900 dark:hover:bg-slate-800">
+                        <td class="h-px w-px whitespace-nowrap px-6 py-2">
+                            <p class="text-sm text-gray-600 dark:text-gray-400">
+                                {{ month_data.month }} {{ month_data.year }}
+
+                            </p>
+                        </td>
+                        <td class="h-px w-px whitespace-nowrap px-6 py-2">
+                               <form method="post" action={% url 'transactions:monthly_report' %}>
+                                   {% csrf_token %}
+
+                                <input type="hidden" name="month" value={{ month_data.month }}>
+                                <input type="hidden" name="year" value={{ month_data.year }}>
+
+                                <button type="submit"
+                                        class="py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md border border-transparent font-semibold bg-blue-500 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all dark:focus:ring-offset-gray-800">
+                                    Send PDF
+                                </button>
+                               </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}
+

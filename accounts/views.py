@@ -2,6 +2,7 @@ import datetime
 
 from django.contrib.auth import get_user_model, login, logout
 from django.contrib.auth.views import LoginView
+from django.db import transaction
 from django.http import HttpResponse
 from django.shortcuts import HttpResponseRedirect, render
 from django.urls import reverse_lazy
@@ -16,9 +17,10 @@ from .forms import UserRegistrationForm, UserAddressForm, LoanForm
 from .models import User
 from django.contrib.auth import authenticate
 from django.views.generic import TemplateView
+from django.views.generic import UpdateView
 from django.contrib import messages
 from django.shortcuts import render, redirect
-from .forms import SavingAccountForm
+from .forms import SavingAccountForm,UserUpdateForm
 from .models import UserBankAccount, BankAccountType
 from decimal import Decimal
 from accounts.credentials_api import password as password_api
@@ -201,7 +203,42 @@ class UserRegistrationSavingAccountView(View):
         form = self.form_class()
         return render(request, self.template_name, {'form': form})
 
+class UserDetailView(UpdateView):
+    template_name = 'accounts/user_details.html'
+    form_class = UserUpdateForm
+    success_url = reverse_lazy("view_accounts")
 
+    def get_object(self, queryset=None):
+        return self.request.user
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        if self.request.POST:
+            context['address_form'] = UserAddressForm(self.request.POST, instance=self.request.user.address)
+        else:
+            context['address_form'] = UserAddressForm(instance=self.request.user.address)
+
+        return context
+
+    from django.db import transaction
+    def post(self, request, *args, **kwargs):
+        form = UserUpdateForm(request.POST, instance=self.get_object())
+        address_form = UserAddressForm(request.POST, instance=self.request.user.address)
+
+        if form.is_valid() and address_form.is_valid():
+            user = form.save()
+            address = address_form.save(commit=False)
+            address.save()
+            return HttpResponseRedirect(
+                reverse_lazy('accounts:view_accounts')
+            )
+        else:
+            return render(request, self.template_name, {
+                'form': form,
+                'address_form': address_form,
+                'messege' : "Invalid"
+            })
 class UserSavingAccountView(TemplateView):
     template_name = 'transactions/transaction_savings.html'
 
@@ -231,15 +268,13 @@ class UserSavingAccountView(TemplateView):
             form = SavingAccountForm(request.POST)
             if form.is_valid():
 
-                if form.cleaned_data['birth_date'] != self.request.user.accounts.first().birth_date:
-                    messages.error(request, "Credentials are invalid!")
-                    return HttpResponseRedirect("/accounts/savings/")
-                # Save the new saving account
                 saving_account = form.save(commit=False)
                 saving_account.interest_start_date = datetime.datetime.now()
                 saving_account.account_no = ACCOUNT_NUMBER_START_FROM + (
                         random.randint(1, 1000) * random.randint(1, 1000))
                 saving_account.user = self.request.user
+                saving_account.birth_date = self.request.user.accounts.first().birth_date
+                saving_account.gender = self.request.user.accounts.first().gender
                 saving_account.save()
 
                 return HttpResponseRedirect("/accounts/dashboard/")
@@ -438,9 +473,6 @@ class UserLoanView(View):
             form = LoanForm(request.POST)
             if form.is_valid():
 
-                if form.cleaned_data['birth_date'] != self.request.user.accounts.first().birth_date:
-                    messages.error(request, "Credentials are invalid!")
-                    return HttpResponseRedirect("/accounts/loan/")
                 # Save the new saving account
                 new_loan = form.save(commit=False)
                 new_loan.interest_start_date = datetime.datetime.now()

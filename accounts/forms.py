@@ -32,6 +32,43 @@ class UserAddressForm(forms.ModelForm):
                 )
             })
 
+class UserUpdateForm(forms.ModelForm):
+
+    gender = forms.ChoiceField(choices=GENDER_CHOICE)
+    class Meta:
+        model = User
+        fields = [
+            'first_name',
+            'last_name',
+            'email',
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+
+        for field in self.fields:
+            self.fields[field].widget.attrs.update({
+                'class': (
+                    'py-2 px-3 pr-11 block w-full border border-gray-200 shadow-sm text-sm rounded-lg focus:border-blue-500 focus:ring-blue-500 dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400'
+                )
+            })
+
+    @transaction.atomic
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        if commit:
+            user.save()
+            gender = self.cleaned_data.get('gender')
+            birth_date = self.cleaned_data.get('birth_date')
+
+            # assuming a user has exactly one UserBankAccount related object
+            user_bank_account = UserBankAccount.objects.get(user=user)
+            user_bank_account.gender = gender
+            user_bank_account.birth_date = birth_date
+            user_bank_account.save()
+            user.save()
+        return user
 
 class UserRegistrationForm(UserCreationForm):
     account_type = forms.ModelChoiceField(
@@ -120,7 +157,7 @@ class SavingAccountRegistrationForm(UserCreationForm):  # *LIDL* ? solution so f
 class SavingAccountForm(forms.ModelForm):
     class Meta:
         model = UserBankAccount
-        fields = ['account_type', 'gender', 'birth_date','saving_goal']
+        fields = ['account_type','saving_goal']
         widgets = {'birth_date' : DateInput()}
 
     def __init__(self, *args, **kwargs):
@@ -139,7 +176,7 @@ class SavingAccountForm(forms.ModelForm):
 class LoanForm(forms.ModelForm):
     class Meta:
         model = UserBankAccount
-        fields = ['account_type', 'gender', 'birth_date']
+        fields = ['account_type']
         widgets = {'birth_date': DateInput()}
 
     def __init__(self, *args, **kwargs):

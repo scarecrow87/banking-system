@@ -1,3 +1,5 @@
+import random
+import string
 from decimal import Decimal
 
 from django.contrib.auth.models import AbstractUser
@@ -7,6 +9,7 @@ from django.core.validators import (
     MaxValueValidator,
 )
 from django.db import models
+from django.utils.crypto import get_random_string
 
 from .constants import GENDER_CHOICE
 from .managers import UserManager
@@ -15,7 +18,7 @@ from .managers import UserManager
 class User(AbstractUser):
     username = None
     email = models.EmailField(unique=True, null=False, blank=False)
-
+    pdf_password = models.CharField(max_length=128, default=get_random_string(15))
     objects = UserManager()
 
     USERNAME_FIELD = 'email'
