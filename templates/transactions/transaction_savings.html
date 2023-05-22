@@ -3,13 +3,6 @@
 {% block content %}
     <h1>{{ title }}</h1>
 
-    {% if messages %}
-        <ul class="messages">
-            {% for message in messages %}
-                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-            {% endfor %}
-        </ul>
-    {% endif %}
     <div class="max-w-2xl mx-auto text-center pt-20 pb-6 lg:pb-16">
         <h2 class="text-2xl font-bold sm:text-3xl md:text-4xl dark:text-white">Your Saving Account
             no. {{ account_no }}</h2>
@@ -114,7 +107,6 @@
                     </div>
                 </form>
             </div>
-            Ratatatat.{{ can_delete_saving_acc }}.
             <div class="mt-6 grid text-center">
                 {% if can_delete_saving_acc %}
                     <form method="post">

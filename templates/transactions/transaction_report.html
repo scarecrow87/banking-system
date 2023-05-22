@@ -41,13 +41,15 @@
                     {% endif %}
                 </div>
 
-                <canvas id="myChart" height="300" class="my-4 p-2 bg-white rounded-md"></canvas>
+                {% if acc.account_type.is_debet_account %}
+                    <canvas id="myChart" height="300" class="my-4 p-2 bg-white rounded-md"></canvas>
+                    <div id="month-data"
+                         class="flex flex-col border border-gray-200 text-center rounded-xl p-4 dark:border-gray-700">
 
-                <div id="month-data"
-                     class="flex flex-col border border-gray-200 text-center rounded-xl p-4 dark:border-gray-700">
+                    </div>
+                {% endif %}
 
-                </div>
-                {% if account_type.name == "Savings" %}
+                {% if account_type.is_saving_account %}
                     <div class="w-full my-6 ">
                         <div class="shadow w-full !bg-grey-500">
                             <div class="bg-blue-400 text-xs leading-none py-2 text-center text-white"
@@ -55,19 +57,19 @@
                             </div>
                         </div>
                     </div>
-                    <div class="bg-grey-100 flex flex-row py-3 justify-between">
-                        <p class="text-sm font-light text-gray-600">
+                    <div class="bg-grey-100 flex flex-row py-3 justify-between text-gray-800 dark:text-gray-200">
+                        <p class="text-sm font-light">
                             Saving goal:
                         </p>
-                        <p class="text-sm text-gray-600">
+                        <p class="text-sm">
                             €{{ saving_goal }}
                         </p>
                     </div>
-                    <div class="bg-grey-100 flex flex-row py-3 justify-between">
-                        <p class="text-sm font-light text-gray-600">
+                    <div class="bg-grey-100 flex flex-row py-3 justify-between text-gray-800 dark:text-gray-200">
+                        <p class="text-sm font-light">
                             Interest rate:
                         </p>
-                        <p class="text-sm text-gray-600">
+                        <p class="text-sm">
                             {{ interest_rate }}%
                         </p>
                     </div>
@@ -278,9 +280,9 @@
                         <input type="hidden" value={{ account.account_no }} name="account_id">
                         <article class="flex items-start gap-4 ">
                                      <span class="material-icons bg-blue-500 p-2 rounded-full">
-                                            {% if account.account_type.name == "Savings" %}
+                                            {% if account.account_type.is_saving_account %}
                                                 savings
-                                            {% elif account.account_type.name == "Checking" %}
+                                            {% elif account.account_type.is_debet_account %}
                                                 payments
                                             {% endif %}
                                         </span>
@@ -300,7 +302,7 @@
                             </div>
                         </article>
 
-                        {% if account.account_type.name == "Savings" %}
+                        {% if account.account_type.is_saving_account %}
                             <div class="w-full">
                                 <div class="border border-gray-200 text-center rounded-xl dark:border-gray-700">
                                     <div class="bg-blue-400 text-xs leading-none py-2 text-center text-gray-800 dark:text-gray-200 border border-gray-200 rounded-xl p-4 dark:border-gray-700"
