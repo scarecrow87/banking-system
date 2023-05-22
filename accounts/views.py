@@ -59,6 +59,7 @@ class UserRegistrationView(TemplateView):
             payload = {"email": user.email}
             requests.post(url, json=payload,headers={'Content-Type': 'application/json',
                                            'Authorization': 'Bearer {}'.format(token)})
+
             messages.success(
                 self.request,
                 (
@@ -225,19 +226,30 @@ class UserDetailView(UpdateView):
     def post(self, request, *args, **kwargs):
         form = UserUpdateForm(request.POST, instance=self.get_object())
         address_form = UserAddressForm(request.POST, instance=self.request.user.address)
-
         if form.is_valid() and address_form.is_valid():
             user = form.save()
             address = address_form.save(commit=False)
             address.save()
-            return HttpResponseRedirect(
-                reverse_lazy('accounts:view_accounts')
+            messages.success(
+                self.request,
+                (
+                    f'Successfully updated! '
+                )
             )
-        else:
             return render(request, self.template_name, {
                 'form': form,
                 'address_form': address_form,
-                'messege' : "Invalid"
+            })
+        else:
+            messages.error(
+                self.request,
+                (
+                    f'Invalid form. '
+                )
+            )
+            return render(request, self.template_name, {
+                'form': form,
+                'address_form': address_form,
             })
 class UserSavingAccountView(TemplateView):
     template_name = 'transactions/transaction_savings.html'

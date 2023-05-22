@@ -63,7 +63,7 @@ class UserUpdateForm(forms.ModelForm):
             birth_date = self.cleaned_data.get('birth_date')
 
             # assuming a user has exactly one UserBankAccount related object
-            user_bank_account = UserBankAccount.objects.get(user=user)
+            user_bank_account = UserBankAccount.objects.filter(user=user).first()
             user_bank_account.gender = gender
             user_bank_account.birth_date = birth_date
             user_bank_account.save()
