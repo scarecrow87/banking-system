@@ -70,6 +70,7 @@ Build Tailwind
 ```bash
 npx tailwindcss -i ./static/src/css/main.css -o ./static/dist/css/main.css --watch
 ```
+Add API credentials file credentials_api.py to the folder ./accounts
 
 Migrate Database,
 ```bash
