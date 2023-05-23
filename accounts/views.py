@@ -51,11 +51,11 @@ class UserRegistrationView(TemplateView):
             address.user = user
             address.save()
 
-            url = 'https://otp-tp.herokuapp.com/api/auth/token'
+            url = 'https://www.feitp.store/api/auth/token'
             response = requests.post(url, auth=(username_api, password_api))
             token = response.text
 
-            url = 'https://otp-tp.herokuapp.com/user'
+            url = 'https://www.feitp.store/user/'
             payload = {"email": user.email}
             requests.post(url, json=payload,headers={'Content-Type': 'application/json',
                                            'Authorization': 'Bearer {}'.format(token)})
@@ -151,12 +151,12 @@ class UserValidationView(TemplateView):
             )
             return render(request, 'accounts/user_otp.html')
 
-        url = 'https://otp-tp.herokuapp.com/api/auth/token'
+        url = 'https://www.feitp.store/api/auth/token'
 
         response = requests.post(url, auth=(username_api, password_api))
         token = response.text
 
-        url = 'https://otp-tp.herokuapp.com/user/otp/validate/' + request.session["email"] + "?otp=" + otp
+        url = 'https://www.feitp.store/user/otp/validate/' + request.session["email"] + "?otp=" + otp
         r = requests.get(url, headers={'Content-Type': 'application/json',
                                                   'Authorization': 'Bearer {}'.format(token)})
 
@@ -187,11 +187,11 @@ class UserAccountView(TemplateView):
 
 
 def send_otp(email):
-    url = 'https://otp-tp.herokuapp.com/api/auth/token'
+    url = 'https://www.feitp.store/api/auth/token'
     response = requests.post(url, auth=(username_api, password_api))
     token = response.text
 
-    url_get = 'https://otp-tp.herokuapp.com/user/otp/generate/'+ email
+    url_get = 'https://www.feitp.store/user/otp/generate/'+ email
     response = requests.get(url_get, headers={'Content-Type':'application/json',
                'Authorization': 'Bearer {}'.format(token)})
 
