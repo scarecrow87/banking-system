@@ -37,6 +37,7 @@ from transactions.forms import (
 from transactions.models import Transaction, SavingTransaction, LoanTransaction
 from accounts.models import UserBankAccount
 from reportlab.pdfgen import canvas
+from django.db.models import Q
 
 MONTHS = {
     0: "Jan",
@@ -372,16 +373,11 @@ class MonthlyReportView(CreateView):
             total=Count('*')).values('month', 'year', 'total').filter(
             account_id=UserBankAccount.objects.filter(user_id=self.request.user.id).first().id)
         context = {'months': months}
-        account = UserBankAccount.objects.first()
 
-        transactions = Transaction.objects.filter(timestamp__year__gte=year,
-                                                  timestamp__month__gte=month,
-                                                  timestamp__year__lte=year,
-                                                  timestamp__month__lte=month,
-                                                  account_id=account.id)
+        transactions = Transaction.objects.filter(Q(timestamp__month=month) & Q(timestamp__year=year),account_id=UserBankAccount.objects.filter(user_id=self.request.user.id).first().id)
 
         buffer = BytesIO()
-
+        print(len(transactions))
 
 
         psHeaderText = ParagraphStyle('Hed0', fontSize=12, alignment=TA_LEFT, borderWidth=3)
