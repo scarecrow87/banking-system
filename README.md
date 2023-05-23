@@ -72,6 +72,15 @@ npx tailwindcss -i ./static/src/css/main.css -o ./static/dist/css/main.css --wat
 ```
 Add API credentials file credentials_api.py to the folder ./accounts
 
+If you want to use a PostgreSQL database, you need to edit the /banking_system/settings.py file and update the DATABASES configuration (comment out the SQLite settings and provide the PostgreSQL settings). Additionally, make sure you have a PostgreSQL server running on your computer.
+Also you need to install pycopg2,
+```bash
+pip install psycopg2
+```
+
+ALTERNATIVE ->
+If you want to use SQLite, you can continue without any further configuration.
+
 Migrate Database,
 ```bash
 python manage.py makemigrations  
