@@ -1,20 +1,25 @@
 # Online Banking System V2.0.2
 
-This is an Online Banking Concept created using Django Web Framework.
+This is an Online Banking Concept optimized by the Team Project at FEI STU. The former banking
+system was made by saadmk11. The system was created using Django Web Framework.
 
 
 ## Features
 
-* Create Bank Account.
+* Create Multiple Bank Accounts
 * Deposit & Withdraw Money
-* Bank Account Type Support (e.g. Current Account, Savings Account)
+* Send money internally between users and accounts
+* Bank Account Type Support (e.g. Debit Account, Savings Account)
 * Interest calculation depending on the Bank Account type
+* Take Loans and calculate interest
 * Transaction report with a date range filter 
-* See balance after every transaction in the Transaction Report
+* Account dashboard - including analytics of expenses and earnings
+* Monthly transaction reports in encrypted PDF format sent to e-mail
+* Two-Factor Authentication
 * Calculate Monthly Interest Using Celery Scheduled tasks
 * More efficient and accurate interest calculation and balance update
 * Ability to add Minimum and Maximum Transaction amount restriction
-* Modern UI with Tailwind CSS
+* UI optimization for mobile and improved UX 
 
 
 ## Prerequisites
@@ -32,8 +37,8 @@ Be sure you have the following installed on your development machine:
 + celery==4.4.7
 + Django==3.2
 + django-celery-beat==2.0.0
-+ python-dateutil==2.8.1
-+ redis==3.5.3
++ pandas==2.0.0
++ python-dateutil==2.8.2+ redis==3.5.3
 + requests==2.28.1
 + reportlab==4.0.0
 + django-ca==1.24.0
@@ -49,23 +54,9 @@ redis-server
 
 ## Project Installation
 
-To setup a local development environment:
-
-Create a virtual environment in which to install Python pip packages. With [virtualenv](https://pypi.python.org/pypi/virtualenv),
-```bash
-virtualenv venv            # create a virtualenv
-source venv/bin/activate   # activate the Python virtualenv 
-```
-
-or with [virtualenvwrapper](http://virtualenvwrapper.readthedocs.org/en/latest/),
-```bash
-mkvirtualenv -p python3 {{project_name}}   # create and activate environment
-workon {{project_name}}   # reactivate existing environment
-```
-
 Clone GitHub Project,
 ```bash
-git@github.com:saadmk11/banking-system.git
+git clone https://github.com/siikmusic/banking-system.git
 
 cd banking-system
 ```
@@ -87,14 +78,14 @@ python manage.py makemigrations
 python manage.py migrate
 ```
 
+Load initial data,
+```bash
+python manage.py loaddata initial_data.json
+```
+
 Run the web application locally,
 ```bash
 python manage.py runserver # 127.0.0.1:8000
-```
-
-Create Superuser, for example : admin@admin.com - xyz123XYZ -> then access admin controls with 127.0.0.1:8000/admin
-```bash
-python manage.py createsuperuser
 ```
 
 Run Celery
@@ -110,8 +101,15 @@ celery -A banking_system worker -l info -P gevent
 celery -A banking_system beat -l info
 ```
 
+To create a Superuser (admin), for example : admin@admin.com - xyz123XYZ -> then access admin controls with 127.0.0.1:8000/admin 
+- note, only access /admin for admin. Register a normal user at /accounts/register/
+```bash
+python manage.py createsuperuser
+```
+
+
 
 ## Images:
-![alt text](https://i.imgur.com/FvgmEJL.png)
+![alt text](static/img/dashboard.png)
 #
-![alt text](https://i.imgur.com/aWzj44Y.png)
+![alt text](static/img/loan.png)

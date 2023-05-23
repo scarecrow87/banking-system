@@ -162,10 +162,10 @@ CELERY_IMPORTS = ('transactions.tasks',)
 CELERY_BEAT_SCHEDULE = {
     'calculate_interest_on_saving_accounts': {
         'task': 'transactions.tasks.calculate_interest_on_saving_accounts',
-        'schedule': 20.0,
+        'schedule': 10800.0,
     },
     'calculate_loan_repayment': {
         'task': 'transactions.tasks.calculate_loan_repayment',
-        'schedule': 20.0,
+        'schedule': 10800.0,
     },
 }

@@ -1,0 +1,53 @@
+[
+   {
+      "model":"accounts.bankaccounttype",
+      "pk":1,
+      "fields":{
+         "name":"Checking",
+         "description":"A debit account is a financial account for managing day to day transactions, offering features like a debit card, online banking, and bill payments. It allows easy access to funds for purchases, bill payments, and cash withdrawals.",
+         "is_debet_account":true,
+         "is_saving_account":false,
+         "is_loan":false,
+         "maximum_withdrawal_amount":"5000.00",
+         "annual_interest_rate":"2.00",
+         "interest_calculation_per_year":6,
+         "loan_principal":null,
+         "loan_interest_rate":null,
+         "loan_length":null
+      }
+   },
+   {
+      "model":"accounts.bankaccounttype",
+      "pk":2,
+      "fields":{
+         "name":"Savings",
+         "description":"A savings account is a secure way to save and grow money over time, offering interest on deposits and setting a goal of saving.",
+         "is_debet_account":false,
+         "is_saving_account":true,
+         "is_loan":false,
+         "maximum_withdrawal_amount":"10000.00",
+         "annual_interest_rate":"3.00",
+         "interest_calculation_per_year":8,
+         "loan_principal":null,
+         "loan_interest_rate":null,
+         "loan_length":null
+      }
+   },
+   {
+      "model":"accounts.bankaccounttype",
+      "pk":3,
+      "fields":{
+         "name":"Loan",
+         "description":"A loan account is a borrowing arrangement where money is borrowed from the bank and repaid over time with interest.",
+         "is_debet_account":false,
+         "is_saving_account":false,
+         "is_loan":true,
+         "maximum_withdrawal_amount":"500.00",
+         "annual_interest_rate":"5.00",
+         "interest_calculation_per_year":2,
+         "loan_principal":"500.00",
+         "loan_interest_rate":"20.21",
+         "loan_length":24
+      }
+   }
+]
