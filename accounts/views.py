@@ -182,7 +182,7 @@ class UserAccountView(TemplateView):
 
     def get(self, request, *args, **kwargs):
         user = User.objects.get(email=request.session["email"])
-        accounts = UserBankAccount.objects.filter(user_id=user.id, account_type__is_debet_account=True).first()
+        accounts = UserBankAccount.objects.filter(user_id=user.id, account_type__is_debit_account=True).first()
         return HttpResponseRedirect("/transactions/report/?account_id=" + str(accounts.account_no))
 
 
@@ -255,12 +255,12 @@ class UserSavingAccountView(TemplateView):
     template_name = 'transactions/transaction_savings.html'
 
     def get(self, request, *args, **kwargs):
-        accountDebet = self.request.user.accounts.first()
+        accountDebit = self.request.user.accounts.first()
         accountSaving = self.request.user.accounts.filter(account_type__is_saving_account=True).first()
         if (accountSaving == None):
             savings_view = UserRegistrationSavingAccountView.as_view()
             return savings_view(request)
-        balance = accountDebet.balance
+        balance = accountDebit.balance
         savings_balance = accountSaving.balance
         interest_rate = accountSaving.account_type.annual_interest_rate
         context = {
@@ -269,7 +269,7 @@ class UserSavingAccountView(TemplateView):
             'savings_balance': savings_balance,
             'interest_rate': interest_rate,
         }
-        if savings_balance == 0:
+        if savings_balance <= 1:
             context['can_delete_saving_acc'] = True
         return render(request, 'transactions/transaction_savings.html', context)
 
@@ -303,7 +303,7 @@ class UserSavingAccountView(TemplateView):
             user_saving_acc.delete()
             return HttpResponseRedirect("/accounts/dashboard/")
 
-        accountDebet = self.request.user.accounts.first()
+        accountDebit = self.request.user.accounts.first()
         accountSaving = self.request.user.accounts.filter(account_type__is_saving_account=True).first()
         if 'depositToSavingAcc' in request.POST:
             amount = Decimal(request.POST.get('depositToSavingAcc'))
@@ -325,10 +325,10 @@ class UserSavingAccountView(TemplateView):
 
             if amount <= 0:
                 messages.error(request, "Invalid operation.")
-            elif accountDebet.balance >= amount:
-                accountDebet.balance -= amount
+            elif accountDebit.balance >= amount:
+                accountDebit.balance -= amount
                 accountSaving.balance += amount
-                accountDebet.save(
+                accountDebit.save(
                     update_fields=[
                         'balance'
                     ]
@@ -341,16 +341,16 @@ class UserSavingAccountView(TemplateView):
 
                 messages.success(
                     self.request,
-                    f'{amount}$ was deposited to your saving account from debet account successfully'
+                    f'{amount}€ was deposited to your saving account from debit account successfully'
                 )
 
                 created_transactions = []
                 created_transactionsSavings = []
                 transaction_obj = Transaction(
-                    account=accountDebet,
+                    account=accountDebit,
                     transaction_type=DEPOSITTSA,
                     amount=-amount,
-                    balance_after_transaction=accountDebet.balance
+                    balance_after_transaction=accountDebit.balance
                 )
                 transaction_objSavings = Transaction(
                     account=accountSaving,
@@ -365,13 +365,13 @@ class UserSavingAccountView(TemplateView):
                     SavingTransaction.objects.bulk_create(created_transactionsSavings)
 
             else:
-                messages.error(request, "Not enough money on debet account!")
+                messages.error(request, "Not enough money on debit account!")
 
-            balance = accountDebet.balance
+            balance = accountDebit.balance
             savings_balance = accountSaving.balance
             interest_rate = accountSaving.account_type.annual_interest_rate
             context = {
-                'account_no': accountDebet.account_no,
+                'account_no': accountDebit.account_no,
                 'balance': balance,
                 'savings_balance': savings_balance,
                 'interest_rate': interest_rate,
@@ -385,8 +385,8 @@ class UserSavingAccountView(TemplateView):
                 messages.error(request, "Invalid operation.")
             elif accountSaving.balance >= amount:
                 accountSaving.balance -= amount
-                accountDebet.balance += amount
-                accountDebet.save(
+                accountDebit.balance += amount
+                accountDebit.save(
                     update_fields=[
                         'balance'
                     ]
@@ -399,16 +399,16 @@ class UserSavingAccountView(TemplateView):
 
                 messages.success(
                     self.request,
-                    f'{amount}$ was deposited to your debet account from saving account successfully'
+                    f'{amount}€ was deposited to your debit account from saving account successfully'
                 )
 
                 created_transactions = []
                 created_transactionsSavings = []
                 transaction_obj = Transaction(
-                    account=accountDebet,
+                    account=accountDebit,
                     transaction_type=WITHDRAWALFSA,
                     amount=amount,
-                    balance_after_transaction=accountDebet.balance
+                    balance_after_transaction=accountDebit.balance
                 )
                 transaction_objSavings = Transaction(
                     account=accountSaving,
@@ -425,7 +425,7 @@ class UserSavingAccountView(TemplateView):
             else:
                 messages.error(request, "Not enough money on your saving account!")
 
-            balance = accountDebet.balance
+            balance = accountDebit.balance
             savings_balance = accountSaving.balance
             interest_rate = accountSaving.account_type.annual_interest_rate
             context = {
@@ -437,7 +437,7 @@ class UserSavingAccountView(TemplateView):
             return render(request, 'transactions/transaction_savings.html', context)
         else:
             messages.error(request, "Invalid operation.")
-            balance = accountDebet.balance
+            balance = accountDebit.balance
             savings_balance = accountSaving.balance
             interest_rate = accountSaving.account_type.annual_interest_rate
             context = {
@@ -493,9 +493,9 @@ class UserLoanView(View):
                 new_loan.user = self.request.user
                 new_loan.save()
 
-                accountDebet = self.request.user.accounts.first()
-                accountDebet.balance += new_loan.account_type.loan_principal
-                accountDebet.save(
+                accountDebit = self.request.user.accounts.first()
+                accountDebit.balance += new_loan.account_type.loan_principal
+                accountDebit.save(
                     update_fields=[
                         'balance'
                     ]
@@ -504,10 +504,10 @@ class UserLoanView(View):
                 created_transactions = []
                 created_transactionsLoan = []
                 transaction_obj = Transaction(
-                    account=accountDebet,
+                    account=accountDebit,
                     transaction_type=LOAN,
                     amount=new_loan.account_type.loan_principal,
-                    balance_after_transaction=accountDebet.balance
+                    balance_after_transaction=accountDebit.balance
                 )
                 transaction_objLoan = Transaction(
                     account=new_loan,
@@ -535,17 +535,17 @@ class UserLoanView(View):
                 return HttpResponseRedirect("/accounts/dashboard/")
             repayment = Decimal(request.POST.get('insta_repayment'))
             if repayment:
-                user_debet_account = self.request.user.accounts.first()
+                user_debit_account = self.request.user.accounts.first()
                 user_loan = self.request.user.accounts.filter(account_type__is_loan=True).first()
                 if user_loan.repayment < round(user_loan.account_type.loan_expected_repayment(), 2):
                     need_to_repay = round(user_loan.account_type.loan_expected_repayment(), 2) - user_loan.repayment
                     if repayment > need_to_repay:
                         messages.error(request, f"You only need to pay {need_to_repay}.")
                     else:
-                        if (user_debet_account.balance >= repayment):
+                        if (user_debit_account.balance >= repayment):
                             user_loan.repayment += repayment
-                            user_debet_account.balance -= repayment
-                            user_debet_account.save(
+                            user_debit_account.balance -= repayment
+                            user_debit_account.save(
                                 update_fields=[
                                     'balance'
                                 ]
@@ -559,10 +559,10 @@ class UserLoanView(View):
                             created_transactions = []
                             created_transactionsLoan = []
                             transaction_obj = Transaction(
-                                account=user_debet_account,
+                                account=user_debit_account,
                                 transaction_type=REPAYMENT,
                                 amount=-repayment,
-                                balance_after_transaction=user_debet_account.balance
+                                balance_after_transaction=user_debit_account.balance
                             )
                             transaction_objLoan = Transaction(
                                 account=user_loan,
@@ -577,11 +577,11 @@ class UserLoanView(View):
                                 LoanTransaction.objects.bulk_create(created_transactionsLoan)
                                 messages.success(
                                     self.request,
-                                    f'{repayment}$ was paid back to bank.'
+                                    f'{repayment}€ was paid back to bank.'
                                 )
 
                             else:
-                                messages.error(request, "Not enough money on debet account!")
+                                messages.error(request, "Not enough money on debit account!")
 
                         print("Nice")
                 else:

@@ -38,7 +38,7 @@ class BankAccountType(models.Model):
     name = models.CharField(max_length=128)
     description = models.TextField()
 
-    is_debet_account = models.BooleanField(default=True)
+    is_debit_account = models.BooleanField(default=True)
     is_saving_account = models.BooleanField(default=False)
     is_loan = models.BooleanField(default=False)
 
@@ -88,11 +88,11 @@ class BankAccountType(models.Model):
 
     def clean(self):
         # At least one account type must be set
-        if not any([self.is_debet_account, self.is_saving_account, self.is_loan]):
+        if not any([self.is_debit_account, self.is_saving_account, self.is_loan]):
             raise ValidationError("At least one account type must be selected.")
 
         # If is_debit_account is True, maximum_withdrawal_amount is required
-        if self.is_debet_account and not self.maximum_withdrawal_amount:
+        if self.is_debit_account and not self.maximum_withdrawal_amount:
             raise ValidationError("Maximum withdrawal amount is required for debit account.")
 
         # If is_saving_account is True, maximum_withdrawal_amount,

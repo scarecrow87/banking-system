@@ -96,6 +96,19 @@ DATABASES = {
     }
 }
 
+# To run a PostgreSQL database, it is necessary to have a running PostgreSQL server/database.
+# Django cannot create it for you like it does with SQLite.
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'name_of_postgresql_database',
+#         'USER': 'user_name',
+#         'PASSWORD': 'user_password',
+#         'HOST': 'localhost',
+#         'PORT': '5432',
+#     }
+# }
+
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
 

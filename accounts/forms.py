@@ -91,7 +91,7 @@ class UserRegistrationForm(UserCreationForm):
         super().__init__(*args, **kwargs)
 
         # Filter account types to show only those with is_saving_account=False
-        self.fields['account_type'].queryset = BankAccountType.objects.filter(is_debet_account=True)
+        self.fields['account_type'].queryset = BankAccountType.objects.filter(is_debit_account=True)
 
         for field in self.fields:
             self.fields[field].widget.attrs.update({

@@ -76,7 +76,7 @@ class TransactionRepostView(LoginRequiredMixin, ListView):
                 daterange = self.form_data.get("daterange")
                 if request.GET.get("transactions"):
                     if daterange:
-                        if account.account_type.is_debet_account:
+                        if account.account_type.is_debit_account:
                             transactions = Transaction.objects.filter(account_id=account.id,
                                                                       timestamp__date__range=daterange)
                         if account.account_type.is_saving_account:
@@ -86,7 +86,7 @@ class TransactionRepostView(LoginRequiredMixin, ListView):
                             transactions = LoanTransaction.objects.filter(account_id=account.id,
                                                                           timestamp__date__range=daterange)
                     else:
-                        if account.account_type.is_debet_account:
+                        if account.account_type.is_debit_account:
                             transactions = Transaction.objects.filter(account_id=account.id)
                         if account.account_type.is_saving_account:
                             transactions = SavingTransaction.objects.filter(account_id=account.id)
@@ -94,7 +94,7 @@ class TransactionRepostView(LoginRequiredMixin, ListView):
                             transactions = LoanTransaction.objects.filter(account_id=account.id)
                 else:
                     if daterange:
-                        if account.account_type.is_debet_account:
+                        if account.account_type.is_debit_account:
                             transactions = Transaction.objects.filter(account_id=account.id,
                                                                       timestamp__date__range=daterange)[:10]
                         if account.account_type.is_saving_account:
@@ -104,7 +104,7 @@ class TransactionRepostView(LoginRequiredMixin, ListView):
                             transactions = LoanTransaction.objects.filter(account_id=account.id,
                                                                           timestamp__date__range=daterange)[:10]
                     else:
-                        if account.account_type.is_debet_account:
+                        if account.account_type.is_debit_account:
                             transactions = Transaction.objects.filter(account_id=account.id)[:10]
                         if account.account_type.is_saving_account:
                             transactions = SavingTransaction.objects.filter(account_id=account.id)[:10]
@@ -247,7 +247,7 @@ class DepositMoneyView(TransactionCreateMixin):
 
         messages.success(
             self.request,
-            f'{amount}$ was deposited to your account successfully'
+            f'{amount}€ was deposited to your account successfully'
         )
 
         form.account = account
@@ -271,7 +271,7 @@ class WithdrawMoneyView(TransactionCreateMixin):
 
         messages.success(
             self.request,
-            f'Successfully withdrawn {amount}$ from your account'
+            f'Successfully withdrawn {amount}€ from your account'
         )
 
         form.account = account
@@ -322,7 +322,7 @@ class TransferMoneyView(CreateView):
                         transaction_to.save()
                         messages.success(
                             self.request,
-                            f'Sent {amount} to {user_to.account_no}'
+                            f'Sent {amount}€ to {user_to.account_no}'
                         )
                     else:
                         messages.error(
