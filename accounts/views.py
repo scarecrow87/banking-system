@@ -51,11 +51,11 @@ class UserRegistrationView(TemplateView):
             address.user = user
             address.save()
 
-            url = 'https://www.feitp.store/api/auth/token'
+            url = 'http://192.168.1.22:5000/api/auth/token'
             response = requests.post(url, auth=(username_api, password_api))
             token = response.text
 
-            url = 'https://www.feitp.store/user/'
+            url = 'http://192.168.1.22:5000/user/'
             payload = {"email": user.email}
             requests.post(url, json=payload,headers={'Content-Type': 'application/json',
                                            'Authorization': 'Bearer {}'.format(token)})
@@ -151,12 +151,12 @@ class UserValidationView(TemplateView):
             )
             return render(request, 'accounts/user_otp.html')
 
-        url = 'https://www.feitp.store/api/auth/token'
+        url = 'http://192.168.1.22:5000/api/auth/token'
 
         response = requests.post(url, auth=(username_api, password_api))
         token = response.text
 
-        url = 'https://www.feitp.store/user/otp/validate/' + request.session["email"] + "?otp=" + otp
+        url = 'http://192.168.1.22:5000/user/otp/validate/' + request.session["email"] + "?otp=" + otp
         r = requests.get(url, headers={'Content-Type': 'application/json',
                                                   'Authorization': 'Bearer {}'.format(token)})
 
@@ -187,11 +187,11 @@ class UserAccountView(TemplateView):
 
 
 def send_otp(email):
-    url = 'https://www.feitp.store/api/auth/token'
+    url = 'http://192.168.1.22:5000/api/auth/token'
     response = requests.post(url, auth=(username_api, password_api))
     token = response.text
 
-    url_get = 'https://www.feitp.store/user/otp/generate/'+ email
+    url_get = 'http://192.168.1.22:5000/user/otp/generate/'+ email
     response = requests.get(url_get, headers={'Content-Type':'application/json',
                'Authorization': 'Bearer {}'.format(token)})
 
