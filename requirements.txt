@@ -1,5 +1,5 @@
-celery==4.4.7
-Django==3.2.9
+celery==5.3.4
+Django==3.2.22
 django-celery-beat==2.1.0
 pandas==2.0.0
 python-dateutil==2.8.2
