@@ -248,7 +248,7 @@ class DepositMoneyView(TransactionCreateMixin):
 
         messages.success(
             self.request,
-            f'{amount}€ was deposited to your account successfully'
+            f'${amount} was deposited to your account successfully'
         )
 
         form.account = account
@@ -272,7 +272,7 @@ class WithdrawMoneyView(TransactionCreateMixin):
 
         messages.success(
             self.request,
-            f'Successfully withdrawn {amount}€ from your account'
+            f'Successfully withdrawn ${amount} from your account'
         )
 
         form.account = account
@@ -323,7 +323,7 @@ class TransferMoneyView(CreateView):
                         transaction_to.save()
                         messages.success(
                             self.request,
-                            f'Sent {amount}€ to {user_to.account_no}'
+                            f'Sent {amount}$ to {user_to.account_no}'
                         )
                     else:
                         messages.error(
@@ -415,7 +415,7 @@ class MonthlyReportView(CreateView):
             transaction_type_string = functools.partial(item._get_FIELD_display,
                                                         field=item._meta.get_field('transaction_type'))()
             date = item.timestamp.strftime("%Y-%m-%d")
-            amount = str(item.amount) + "€"
+            amount = "$" + str(item.amount)
             print(transaction_type_string, date, item.amount)
             column_data = [date, transaction_type_string, amount]
             for col in column_data:

@@ -341,7 +341,7 @@ class UserSavingAccountView(TemplateView):
 
                 messages.success(
                     self.request,
-                    f'{amount}€ was deposited to your saving account from debit account successfully'
+                    f'${amount} was deposited to your saving account from debit account successfully'
                 )
 
                 created_transactions = []
@@ -399,7 +399,7 @@ class UserSavingAccountView(TemplateView):
 
                 messages.success(
                     self.request,
-                    f'{amount}€ was deposited to your debit account from saving account successfully'
+                    f'${amount} was deposited to your debit account from saving account successfully'
                 )
 
                 created_transactions = []
@@ -577,7 +577,7 @@ class UserLoanView(View):
                                 LoanTransaction.objects.bulk_create(created_transactionsLoan)
                                 messages.success(
                                     self.request,
-                                    f'{repayment}€ was paid back to bank.'
+                                    f'${repayment} was paid back to bank.'
                                 )
 
                             else:

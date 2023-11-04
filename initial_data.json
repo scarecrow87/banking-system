@@ -4,7 +4,7 @@
       "pk":1,
       "fields":{
          "name":"Checking",
-         "description":"A debit account is a financial account for managing day to day transactions, offering features like a debit card, online banking, and bill payments. It allows easy access to funds for purchases, bill payments, and cash withdrawals. Current maximum withdrawal amount is 5000€.",
+         "description":"A debit account is a financial account for managing day to day transactions, offering features like a debit card, online banking, and bill payments. It allows easy access to funds for purchases, bill payments, and cash withdrawals. Current maximum withdrawal amount is $5000.",
          "is_debit_account":true,
          "is_saving_account":false,
          "is_loan":false,
@@ -38,7 +38,7 @@
       "pk":3,
       "fields":{
          "name":"Loan",
-         "description":"A loan account is a borrowing arrangement where money is borrowed from the bank and repaid over time with interest. Current selected loan is 500€, with repayment 600€ (3% - 24 Months).",
+         "description":"A loan account is a borrowing arrangement where money is borrowed from the bank and repaid over time with interest. Current selected loan is $500, with repayment $600 (3% - 24 Months).",
          "is_debit_account":false,
          "is_saving_account":false,
          "is_loan":true,

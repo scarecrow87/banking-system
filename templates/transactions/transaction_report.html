@@ -32,10 +32,10 @@
                 </p>
                 {% if acc.account_type.is_loan %}
 
-                    <p class="mt-5 font-bold text-2xl text-gray-800 dark:text-gray-200">{{ acc.repayment }}€
-                        / {{ expected_repayment }}€</p>
+                    <p class="mt-5 font-bold text-2xl text-gray-800 dark:text-gray-200">${{ acc.repayment }}
+                        / ${{ expected_repayment }}</p>
                 {% else %}
-                    <p class="mt-5 font-bold text-2xl text-gray-800 dark:text-gray-200">{{ account_balance }}€</p>
+                    <p class="mt-5 font-bold text-2xl text-gray-800 dark:text-gray-200">${{ account_balance }}</p>
                 {% endif %}
             </div>
 
@@ -60,7 +60,7 @@
                         Saving goal:
                     </p>
                     <p class="text-sm">
-                        €{{ saving_goal }}
+                        ${{ saving_goal }}
                     </p>
                 </div>
                 <div class="bg-grey-100 flex flex-row py-3 justify-between text-gray-800 dark:text-gray-200">
@@ -254,7 +254,7 @@
 
                                                 <td class="h-px w-px whitespace-nowrap px-6 py-2">
                                                     <p class="text-sm text-gray-600 dark:text-gray-400">
-                                                        {{ transaction.amount }}€
+                                                        ${{ transaction.amount }}
                                                     </p>
                                                 </td>
                                             </tr>
@@ -291,11 +291,11 @@
                                 account </p>
                             <p class="text-2xl font-medium text-green-400">
                                 {% if account.account_type.is_saving_account %}
-                                    {{ account.balance }}€
+                                    ${{ account.balance }}
                                 {% elif account.account_type.is_debit_account %}
-                                    {{ account.balance }}€
+                                    ${{ account.balance }}
                                 {% elif account.account_type.is_loan %}
-                                    {{ account.repayment }}€
+                                    ${{ account.repayment }}
                                 {% endif %}
                             </p>
 
@@ -315,7 +315,7 @@
                                 Saving goal:
                             </p>
                             <p class="text-sm text-gray-800 dark:text-gray-200">
-                                {{ account.saving_goal }}€
+                                ${{ account.saving_goal }}
                             </p>
                         </div>
 
@@ -333,12 +333,12 @@
         function drawReport(spent, earned, total, month) {
             $("#month-data").empty();
             $("#month-data").append(`<p class='font-medium text-lg text-gray-800 dark:text-gray-200'>${month}</p>`);
-            $("#month-data").append(`<p class='text-2xl font-medium text-gray-800 dark:text-white'> € ${earned.toFixed(2)}</p>`);
-            $("#month-data").append(`<p class='text-2xl font-medium text-gray-800 dark:text-white'> € ${(-spent).toFixed(2)}</p>`);
+            $("#month-data").append(`<p class='text-2xl font-medium text-gray-800 dark:text-white'> $ ${earned.toFixed(2)}</p>`);
+            $("#month-data").append(`<p class='text-2xl font-medium text-gray-800 dark:text-white'> $ ${(-spent).toFixed(2)}</p>`);
             if (total > 0) {
-                $("#month-data").append(`<p class="text-2xl font-medium text-green-400">€ ${total.toFixed(2)}</p>`);
+                $("#month-data").append(`<p class="text-2xl font-medium text-green-400">$ ${total.toFixed(2)}</p>`);
             } else {
-                $("#month-data").append(`<p class="text-2xl font-medium text-red-400">€ ${total.toFixed(2)}</p>`);
+                $("#month-data").append(`<p class="text-2xl font-medium text-red-400">$ ${total.toFixed(2)}</p>`);
             }
         }
 
