@@ -19,8 +19,10 @@ from django.urls import include, path
 from accounts.views import get_account_type_description
 from core.views import HomeView
 
-from django.contrib.auth.models import User
+#from django.contrib.auth.models import User
 from rest_framework import routers, serializers, viewsets
+from django.contrib.auth import get_user_model
+User = get_user_model()
 
 # Serializers define the API representation.
 class UserSerializer(serializers.HyperlinkedModelSerializer):
