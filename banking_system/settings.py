@@ -28,7 +28,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-EMAIL_USE_TLS = false
+EMAIL_USE_TLS = False
 EMAIL_HOST = "192.168.1.210"
 EMAIL_PORT = 25
 #EMAIL_HOST_USER = "feitpotp@gmail.com"
