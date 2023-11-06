@@ -19,6 +19,7 @@ from django.urls import include, path
 from accounts.views import get_account_type_description
 from core.views import HomeView
 
+from django.contrib.auth.models import User
 from rest_framework import routers, serializers, viewsets
 
 # Serializers define the API representation.
