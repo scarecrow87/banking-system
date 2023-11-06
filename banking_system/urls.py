@@ -45,6 +45,6 @@ urlpatterns = [
     path(
         'transactions/',
         include('transactions.urls', namespace='transactions')
-    )
+    ),
     path('api-auth/', include('rest_framework.urls'))
 ]
