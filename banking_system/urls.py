@@ -50,5 +50,6 @@ urlpatterns = [
         include('transactions.urls', namespace='transactions')
     ),
      path('api/', include(router.urls)),
-    path('api-auth/', include('rest_framework.urls'))
+    path('api-auth/', include('rest_framework.urls')),
+    path('ui/', include('ui.urls', namespace='urls'))
 ]

@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'core',
     'transactions',
     'rest_framework',
+    'ui',
 ]
 
 MIDDLEWARE = [
