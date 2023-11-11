@@ -6,8 +6,6 @@ from .views import UserRegistrationView, LogoutView, UserLoginView, UserAccountV
 app_name = 'ui'
 
 urlpatterns = [
-    path(
-        "test/", UserLoginView.as_view(),
-        name="test"
+   path('details', UserDetailView.as_view(), name="edit_user")
  
 ]
