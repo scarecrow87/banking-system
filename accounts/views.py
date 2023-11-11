@@ -51,14 +51,14 @@ class UserRegistrationView(TemplateView):
             address.user = user
             address.save()
 
-            url = 'http://192.168.1.22:5000/api/auth/token'
-            response = requests.post(url, auth=(username_api, password_api))
-            token = response.text
+       #     url = 'http://192.168.1.22:5000/api/auth/token'
+       ##     response = requests.post(url, auth=(username_api, password_api))
+        #    token = response.text
 
-            url = 'http://192.168.1.22:5000/user/'
-            payload = {"email": user.email}
-            requests.post(url, json=payload,headers={'Content-Type': 'application/json',
-                                           'Authorization': 'Bearer {}'.format(token)})
+       #     url = 'http://192.168.1.22:5000/user/'
+       #     payload = {"email": user.email}
+       #     requests.post(url, json=payload,headers={'Content-Type': 'application/json',
+       #                                    'Authorization': 'Bearer {}'.format(token)})
 
             messages.success(
                 self.request,
@@ -68,7 +68,7 @@ class UserRegistrationView(TemplateView):
                 )
             )
             return HttpResponseRedirect(
-                reverse_lazy('accounts:user_validation')
+                reverse_lazy('transactions:deposit_money')
             )
 
         return self.render_to_response(
@@ -88,26 +88,27 @@ class UserRegistrationView(TemplateView):
 
 class UserLoginView(LoginView):
     template_name = 'accounts/user_login.html'
+    redirect_authenticated_user = True
 
-    def post(self, request, *args, **kwargs):
-        user = authenticate(username=request.POST["username"], password=request.POST["password"])
-        if user is not None:
-            request.session["email"] = request.POST["username"]
-            email = request.session["email"]
-            send_otp(email)
-            return HttpResponseRedirect(
-                reverse_lazy('accounts:user_validation')
-            )
-        else:
-            messages.error(
-                self.request,
-                (
-                    f'Wrong credentials. '
-                )
-            )
-            return HttpResponseRedirect(
-                reverse_lazy('accounts:user_login')
-            )
+  #  def post(self, request, *args, **kwargs):
+  #      user = authenticate(username=request.POST["username"], password=request.POST["password"])
+  #      if user is not None:
+  #          request.session["email"] = request.POST["username"]
+  #          email = request.session["email"]
+  #          send_otp(email)
+  ##          return HttpResponseRedirect(
+  #              reverse_lazy('accounts:user_validation')
+  #          )
+  #      else:
+  #          messages.error(
+  #              self.request,
+  #              (
+  #                  f'Wrong credentials. '
+  #              )
+  #          )
+  #          return HttpResponseRedirect(
+  #              reverse_lazy('accounts:user_login')
+  #          )
 
 
 class LogoutView(RedirectView):
