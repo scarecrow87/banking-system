@@ -183,7 +183,7 @@ class UserAccountView(TemplateView):
 
     def get(self, request, *args, **kwargs):
        # user = #User.objects.get(email=request.session["email"])
-        user = User.objects.get(id=2)
+        user = User.objects.get(id=1)
         email = user.email
         accounts = UserBankAccount.objects.filter(user_id=user.id, account_type__is_debit_account=True).first()
         return HttpResponseRedirect("/transactions/report/?account_id=" + str(accounts.account_no))
