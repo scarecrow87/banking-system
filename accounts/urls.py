@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .views import UserRegistrationView, LogoutView, UserLoginView, UserAccountView, \
+from accounts.views import UserRegistrationView, LogoutView, UserLoginView, UserAccountView, \
     UserSavingAccountView, UserRegistrationSavingAccountView, UserLoanView, get_account_type_description, UserDetailView
 
 app_name = 'accounts'
