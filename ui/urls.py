@@ -10,7 +10,6 @@ User = get_user_model()
 router = routers.DefaultRouter()
 router.register(r'users', UserViewSet)
 
-
 app_name = 'ui'
 
 urlpatterns = [
